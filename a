@@ -1,0 +1,1198 @@
+local lib = {}
+
+function lib:CreateWindow(title)
+	local UI = Instance.new("ScreenGui")
+	local Main = Instance.new("Frame")
+	local UICorner = Instance.new("UICorner")
+	local UIStroke = Instance.new("UIStroke")
+	local UIGradient = Instance.new("UIGradient")
+	
+	local TopBar = Instance.new("Frame")
+	local Title = Instance.new("TextLabel")
+	local Line = Instance.new("Frame")
+	local Navigation = Instance.new("ScrollingFrame")
+	local UIListLayout = Instance.new("UIListLayout")
+	local UIPadding = Instance.new("UIPadding")
+	local Line_2 = Instance.new("Frame")
+	local ContentContainer = Instance.new("Frame")
+	local ExitButton = Instance.new("ImageButton")
+	local MobileCard = Instance.new("TextButton")
+	local UICorner_Mobile = Instance.new("UICorner")
+	local UIStroke_Mobile = Instance.new("UIStroke")
+
+	UI.Name = "KairoUI"
+	UI.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+	UI.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+	UI.DisplayOrder = 999999999
+	UI.ResetOnSpawn = false
+	UI.IgnoreGuiInset = true
+
+	Main.Name = "Main"
+	Main.Parent = UI
+	Main.BackgroundColor3 = Color3.fromRGB(15, 15, 20)
+	Main.Position = UDim2.new(0.5, 0, 0.5, 0)
+	Main.AnchorPoint = Vector2.new(0.5, 0.5)
+	
+	local UserInputService = game:GetService("UserInputService")
+	local TweenService = game:GetService("TweenService")
+	local IsMobile = UserInputService.TouchEnabled
+	local NavWidth = IsMobile and 95 or 150
+	local TopBarHeight = IsMobile and 38 or 50
+	if UserInputService.TouchEnabled then
+		Main.Size = UDim2.new(0.58, 0, 0.87, 0)
+	else
+		Main.Size = UDim2.new(0.54, 0, 0.54, 0)
+	end
+
+	UICorner.CornerRadius = UDim.new(0, 10)
+	UICorner.Parent = Main
+
+	UIStroke.Color = Color3.fromRGB(50, 50, 70)
+	UIStroke.Thickness = 1.2
+	UIStroke.Transparency = 0.3
+	UIStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+	UIStroke.Parent = Main
+
+	UIGradient.Color = ColorSequence.new({
+		ColorSequenceKeypoint.new(0, Color3.fromRGB(18, 18, 26)),
+		ColorSequenceKeypoint.new(1, Color3.fromRGB(10, 10, 14))
+	})
+	UIGradient.Rotation = 45
+	UIGradient.Parent = Main
+
+	TopBar.Name = "TopBar"
+	TopBar.Parent = Main
+	TopBar.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+	TopBar.BackgroundTransparency = 1.000
+	TopBar.Size = UDim2.new(1, 0, 0, TopBarHeight)
+
+	Title.Name = "Title"
+	Title.Parent = TopBar
+	Title.BackgroundTransparency = 1.000
+	Title.Position = UDim2.new(0, 18, 0, 0)
+	Title.Size = UDim2.new(0, 200, 1, 0)
+	Title.Font = Enum.Font.GothamBold
+	Title.Text = title
+	Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+	Title.TextSize = IsMobile and 17 or 18
+	Title.TextXAlignment = Enum.TextXAlignment.Left
+
+	ExitButton.Name = "ExitButton"
+	ExitButton.Parent = TopBar
+	ExitButton.BackgroundTransparency = 1.000
+	ExitButton.Position = UDim2.new(1, -40, 0.5, -(IsMobile and 13 or 15))
+	ExitButton.Size = UDim2.new(0, IsMobile and 26 or 30, 0, IsMobile and 26 or 30)
+	ExitButton.Image = "rbxassetid://10747384394"
+	ExitButton.ImageColor3 = Color3.fromRGB(255, 90, 90)
+	ExitButton.ImageTransparency = 0.4
+
+	ExitButton.MouseEnter:Connect(function()
+		TweenService:Create(ExitButton, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {ImageTransparency = 0, ImageColor3 = Color3.fromRGB(255, 60, 60)}):Play()
+	end)
+	ExitButton.MouseLeave:Connect(function()
+		TweenService:Create(ExitButton, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {ImageTransparency = 0.4, ImageColor3 = Color3.fromRGB(255, 90, 90)}):Play()
+	end)
+
+	ExitButton.MouseButton1Click:Connect(function()
+		Main.Visible = false
+	end)
+	ExitButton.TouchTap:Connect(function()
+		Main.Visible = false
+	end)
+
+	local MinimizeButton = Instance.new("ImageButton")
+	local MinimizeLine = Instance.new("Frame")
+
+	MinimizeButton.Name = "MinimizeButton"
+	MinimizeButton.Parent = TopBar
+	MinimizeButton.BackgroundTransparency = 1.000
+	MinimizeButton.Position = UDim2.new(1, -(IsMobile and 68 or 75), 0.5, -(IsMobile and 13 or 15))
+	MinimizeButton.Size = UDim2.new(0, IsMobile and 26 or 30, 0, IsMobile and 26 or 30)
+
+	MinimizeLine.Name = "Line"
+	MinimizeLine.Parent = MinimizeButton
+	MinimizeLine.AnchorPoint = Vector2.new(0.5, 0.5)
+	MinimizeLine.BackgroundColor3 = Color3.fromRGB(200, 200, 220)
+	MinimizeLine.BackgroundTransparency = 0.4
+	MinimizeLine.BorderSizePixel = 0
+	MinimizeLine.Position = UDim2.new(0.5, 0, 0.5, 0)
+	MinimizeLine.Size = UDim2.new(0, 14, 0, 2)
+
+	MinimizeButton.MouseEnter:Connect(function()
+		TweenService:Create(MinimizeLine, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {BackgroundTransparency = 0, BackgroundColor3 = Color3.fromRGB(255, 255, 255)}):Play()
+	end)
+	MinimizeButton.MouseLeave:Connect(function()
+		TweenService:Create(MinimizeLine, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {BackgroundTransparency = 0.4, BackgroundColor3 = Color3.fromRGB(200, 200, 220)}):Play()
+	end)
+
+	MinimizeButton.MouseButton1Click:Connect(function()
+		Main.Visible = false
+		if not UserInputService.TouchEnabled and lib.OnMinimize then
+			pcall(lib.OnMinimize)
+		end
+	end)
+	MinimizeButton.TouchTap:Connect(function()
+		Main.Visible = false
+	end)
+
+	Line.Name = "Line"
+	Line.Parent = Main
+	Line.BackgroundColor3 = Color3.fromRGB(60, 60, 80)
+	Line.BackgroundTransparency = 0.600
+	Line.BorderSizePixel = 0
+	Line.Position = UDim2.new(0, 0, 0, TopBarHeight)
+	Line.Size = UDim2.new(1, 0, 0, 1)
+
+	Navigation.Name = "Navigation"
+	Navigation.Parent = Main
+	Navigation.Active = true
+	Navigation.BackgroundTransparency = 1.000
+	Navigation.ScrollBarThickness = 0
+	Navigation.Position = UDim2.new(0, 0, 0, TopBarHeight + 1)
+	Navigation.Size = UDim2.new(0, NavWidth, 1, -(TopBarHeight + 1))
+	Navigation.AutomaticCanvasSize = Enum.AutomaticSize.Y
+
+	UIListLayout.Parent = Navigation
+	UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+	UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+	UIListLayout.Padding = UDim.new(0, IsMobile and 4 or 5)
+
+	UIPadding.Parent = Navigation
+	UIPadding.PaddingTop = UDim.new(0, IsMobile and 7 or 10)
+
+	Line_2.Name = "Line"
+	Line_2.Parent = Main
+	Line_2.BackgroundColor3 = Color3.fromRGB(60, 60, 80)
+	Line_2.BackgroundTransparency = 0.600
+	Line_2.BorderSizePixel = 0
+	Line_2.Position = UDim2.new(0, NavWidth, 0, TopBarHeight + 1)
+	Line_2.Size = UDim2.new(0, 1, 1, -(TopBarHeight + 1))
+
+	ContentContainer.Name = "ContentContainer"
+	ContentContainer.Parent = Main
+	ContentContainer.BackgroundTransparency = 1.000
+	ContentContainer.Position = UDim2.new(0, NavWidth + 1, 0, TopBarHeight + 1)
+	ContentContainer.Size = UDim2.new(1, -(NavWidth + 1), 1, -(TopBarHeight + 1))
+
+	MobileCard.Name = "MobileCard"
+	MobileCard.Parent = UI
+	MobileCard.BackgroundColor3 = Color3.fromRGB(18, 18, 24)
+	MobileCard.BorderSizePixel = 0
+	MobileCard.Position = UDim2.new(0.05, 0, 0.05, 0)
+	MobileCard.Size = UDim2.new(0, 120, 0, 50)
+	MobileCard.AutoButtonColor = false
+	MobileCard.Text = "Aero"
+	MobileCard.TextColor3 = Color3.fromRGB(255, 255, 255)
+	MobileCard.Font = Enum.Font.GothamBold
+	MobileCard.TextSize = 18
+
+	UICorner_Mobile.CornerRadius = UDim.new(0, 10)
+	UICorner_Mobile.Parent = MobileCard
+
+	UIStroke_Mobile.Color = Color3.fromRGB(99, 102, 241)
+	UIStroke_Mobile.Thickness = 1.5
+	UIStroke_Mobile.Parent = MobileCard
+	
+	local MobileGradient = Instance.new("UIGradient")
+	MobileGradient.Color = ColorSequence.new({
+		ColorSequenceKeypoint.new(0, Color3.fromRGB(99, 102, 241)),
+		ColorSequenceKeypoint.new(1, Color3.fromRGB(168, 85, 247))
+	})
+	MobileGradient.Parent = UIStroke_Mobile
+
+	MinimizeButton.Visible = true
+	MobileCard.Visible = false
+
+	Main:GetPropertyChangedSignal("Visible"):Connect(function()
+		if Main.Visible then
+			MobileCard.Visible = false
+		else
+			MobileCard.Visible = UserInputService.TouchEnabled
+		end
+	end)
+
+	MobileCard.MouseButton1Click:Connect(function()
+		Main.Visible = true
+	end)
+	MobileCard.TouchTap:Connect(function()
+		Main.Visible = true
+	end)
+
+	local dragging, dragInput, dragStart, startPos
+
+	local function update(input)
+		local delta = input.Position - dragStart
+		Main.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+	end
+
+	TopBar.InputBegan:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+			dragging = true
+			dragStart = input.Position
+			startPos = Main.Position
+			input.Changed:Connect(function()
+				if input.UserInputState == Enum.UserInputState.End then
+					dragging = false
+				end
+			end)
+		end
+	end)
+
+	TopBar.InputChanged:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+			dragInput = input
+		end
+	end)
+
+	UserInputService.InputChanged:Connect(function(input)
+		if input == dragInput and dragging then
+			update(input)
+		end
+	end)
+
+	local mDragging, mDragInput, mDragStart, mStartPos
+
+	local function updateMobile(input)
+		local delta = input.Position - mDragStart
+		MobileCard.Position = UDim2.new(mStartPos.X.Scale, mStartPos.X.Offset + delta.X, mStartPos.Y.Scale, mStartPos.Y.Offset + delta.Y)
+	end
+
+	MobileCard.InputBegan:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+			mDragging = true
+			mDragStart = input.Position
+			mStartPos = MobileCard.Position
+			input.Changed:Connect(function()
+				if input.UserInputState == Enum.UserInputState.End then
+					mDragging = false
+				end
+			end)
+		end
+	end)
+
+	MobileCard.InputChanged:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+			mDragInput = input
+		end
+	end)
+
+	UserInputService.InputChanged:Connect(function(input)
+		if input == mDragInput and mDragging then
+			updateMobile(input)
+		end
+	end)
+
+	local tabs = {}
+
+	function lib:CreateTab(title, iconId)
+		local TabBtn = Instance.new("TextButton")
+		local UICorner_Tab = Instance.new("UICorner")
+		local UIStroke_Tab = Instance.new("UIStroke")
+		local Icon = Instance.new("ImageLabel")
+		local TabFrame = Instance.new("Frame")
+		local SubTabBar = Instance.new("ScrollingFrame")
+		local SubTabListLayout = Instance.new("UIListLayout")
+		local SubTabPadding = Instance.new("UIPadding")
+		local ElementsContainer = Instance.new("Frame")
+
+		TabBtn.Name = title
+		TabBtn.Parent = Navigation
+		TabBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 45)
+		TabBtn.BackgroundTransparency = 1.000
+		TabBtn.Size = UDim2.new(0.9, 0, 0, IsMobile and 32 or 35)
+		TabBtn.Font = Enum.Font.GothamMedium
+		TabBtn.Text = "   " .. title
+		TabBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+		TabBtn.TextSize = IsMobile and 12 or 14
+		TabBtn.TextTransparency = 0.5
+		TabBtn.TextXAlignment = Enum.TextXAlignment.Left
+		TabBtn.AutoButtonColor = false
+
+		UICorner_Tab.CornerRadius = UDim.new(0, 6)
+		UICorner_Tab.Parent = TabBtn
+
+		UIStroke_Tab.Color = Color3.fromRGB(99, 102, 241)
+		UIStroke_Tab.Thickness = 1
+		UIStroke_Tab.Transparency = 1
+		UIStroke_Tab.Parent = TabBtn
+
+		if iconId then
+			Icon.Parent = TabBtn
+			Icon.BackgroundTransparency = 1.000
+			Icon.Position = UDim2.new(0, IsMobile and 7 or 10, 0.5, -8)
+			Icon.Size = UDim2.new(0, IsMobile and 15 or 16, 0, IsMobile and 15 or 16)
+			Icon.Image = iconId
+			Icon.ImageColor3 = Color3.fromRGB(255, 255, 255)
+			Icon.ImageTransparency = 0.5
+			TabBtn.Text = "         " .. title
+		end
+
+		TabFrame.Name = title .. "_Frame"
+		TabFrame.Parent = ContentContainer
+		TabFrame.Size = UDim2.new(1, 0, 1, 0)
+		TabFrame.BackgroundTransparency = 1
+		TabFrame.Visible = false
+
+		SubTabBar.Name = "SubTabBar"
+		SubTabBar.Parent = TabFrame
+		SubTabBar.BackgroundTransparency = 1
+		SubTabBar.Size = UDim2.new(1, 0, 0, IsMobile and 32 or 35)
+		SubTabBar.ScrollBarThickness = 0
+		SubTabBar.CanvasSize = UDim2.new(2, 0, 0, 0)
+
+		SubTabListLayout.Parent = SubTabBar
+		SubTabListLayout.FillDirection = Enum.FillDirection.Horizontal
+		SubTabListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+		SubTabListLayout.Padding = UDim.new(0, 20)
+
+		SubTabPadding.Parent = SubTabBar
+		SubTabPadding.PaddingLeft = UDim.new(0, 20)
+		SubTabPadding.PaddingTop = UDim.new(0, 10)
+
+		ElementsContainer.Name = "ElementsContainer"
+		ElementsContainer.Parent = TabFrame
+		ElementsContainer.BackgroundTransparency = 1
+		ElementsContainer.Position = UDim2.new(0, 0, 0, IsMobile and 34 or 40)
+		ElementsContainer.Size = UDim2.new(1, 0, 1, -(IsMobile and 34 or 40))
+
+		table.insert(tabs, {Button = TabBtn, Frame = TabFrame, Icon = Icon, Stroke = UIStroke_Tab})
+
+		local function updateTabVisuals(active)
+			if active then
+				TweenService:Create(TabBtn, TweenInfo.new(0.2), {BackgroundTransparency = 0.5, TextTransparency = 0}):Play()
+				TweenService:Create(UIStroke_Tab, TweenInfo.new(0.2), {Transparency = 0.5}):Play()
+				if iconId then
+					TweenService:Create(Icon, TweenInfo.new(0.2), {ImageTransparency = 0}):Play()
+				end
+			else
+				TweenService:Create(TabBtn, TweenInfo.new(0.2), {BackgroundTransparency = 1.0, TextTransparency = 0.5}):Play()
+				TweenService:Create(UIStroke_Tab, TweenInfo.new(0.2), {Transparency = 1.0}):Play()
+				if iconId then
+					TweenService:Create(Icon, TweenInfo.new(0.2), {ImageTransparency = 0.5}):Play()
+				end
+			end
+		end
+
+		TabBtn.MouseEnter:Connect(function()
+			if TabFrame.Visible == false then
+				TweenService:Create(TabBtn, TweenInfo.new(0.15), {BackgroundTransparency = 0.8, TextTransparency = 0.2}):Play()
+				if iconId then
+					TweenService:Create(Icon, TweenInfo.new(0.15), {ImageTransparency = 0.2}):Play()
+				end
+			end
+		end)
+
+		TabBtn.MouseLeave:Connect(function()
+			if TabFrame.Visible == false then
+				TweenService:Create(TabBtn, TweenInfo.new(0.15), {BackgroundTransparency = 1.0, TextTransparency = 0.5}):Play()
+				if iconId then
+					TweenService:Create(Icon, TweenInfo.new(0.15), {ImageTransparency = 0.5}):Play()
+				end
+			end
+		end)
+
+		TabBtn.MouseButton1Click:Connect(function()
+			for _, t in ipairs(tabs) do
+				t.Frame.Visible = false
+				if t.Button == TabBtn then
+					updateTabVisuals(true)
+				else
+					TweenService:Create(t.Button, TweenInfo.new(0.2), {BackgroundTransparency = 1.0, TextTransparency = 0.5}):Play()
+					TweenService:Create(t.Stroke, TweenInfo.new(0.2), {Transparency = 1.0}):Play()
+					if t.Icon then
+						TweenService:Create(t.Icon, TweenInfo.new(0.2), {ImageTransparency = 0.5}):Play()
+					end
+				end
+			end
+			TabFrame.Visible = true
+		end)
+
+		local TabObject = {
+			Container = ElementsContainer,
+			TabBar = SubTabBar,
+			SubTabs = {}
+		}
+
+		function TabObject:CreateSubTab(subTitle)
+			local SubBtn = Instance.new("TextButton")
+			local IndicatorLine = Instance.new("Frame")
+			local UIGradient_Line = Instance.new("UIGradient")
+			local SubCanvas = Instance.new("ScrollingFrame")
+			local SubList = Instance.new("UIListLayout")
+			local SubPad = Instance.new("UIPadding")
+
+			SubBtn.Name = subTitle
+			SubBtn.Parent = self.TabBar
+			SubBtn.BackgroundTransparency = 1
+			SubBtn.Size = UDim2.new(0, 0, 1, 0)
+			SubBtn.AutomaticSize = Enum.AutomaticSize.X
+			SubBtn.Font = Enum.Font.GothamMedium
+			SubBtn.Text = subTitle
+			SubBtn.TextColor3 = Color3.fromRGB(180, 180, 200)
+			SubBtn.TextSize = 14.000
+
+			IndicatorLine.Parent = SubBtn
+			IndicatorLine.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+			IndicatorLine.BorderSizePixel = 0
+			IndicatorLine.Position = UDim2.new(0, 0, 1, -2)
+			IndicatorLine.Size = UDim2.new(1, 0, 0, 2)
+			IndicatorLine.BackgroundTransparency = 1
+
+			UIGradient_Line.Color = ColorSequence.new({
+				ColorSequenceKeypoint.new(0, Color3.fromRGB(99, 102, 241)),
+				ColorSequenceKeypoint.new(1, Color3.fromRGB(168, 85, 247))
+			})
+			UIGradient_Line.Parent = IndicatorLine
+
+			SubCanvas.Name = subTitle .. "_Canvas"
+			SubCanvas.Parent = self.Container
+			SubCanvas.BackgroundTransparency = 1
+			SubCanvas.Size = UDim2.new(1, 0, 1, 0)
+			SubCanvas.ScrollBarThickness = 0
+			SubCanvas.AutomaticCanvasSize = Enum.AutomaticSize.Y
+			SubCanvas.Visible = false
+
+			SubList.Parent = SubCanvas
+			SubList.HorizontalAlignment = Enum.HorizontalAlignment.Center
+			SubList.SortOrder = Enum.SortOrder.LayoutOrder
+			SubList.Padding = UDim.new(0, 8)
+
+			SubPad.Parent = SubCanvas
+			SubPad.PaddingTop = UDim.new(0, 5)
+			SubPad.PaddingBottom = UDim.new(0, 15)
+
+			table.insert(self.SubTabs, {Button = SubBtn, Canvas = SubCanvas, Line = IndicatorLine})
+
+			SubBtn.MouseEnter:Connect(function()
+				if SubCanvas.Visible == false then
+					TweenService:Create(SubBtn, TweenInfo.new(0.15), {TextColor3 = Color3.fromRGB(220, 220, 240)}):Play()
+				end
+			end)
+			SubBtn.MouseLeave:Connect(function()
+				if SubCanvas.Visible == false then
+					TweenService:Create(SubBtn, TweenInfo.new(0.15), {TextColor3 = Color3.fromRGB(180, 180, 200)}):Play()
+				end
+			end)
+
+			SubBtn.MouseButton1Click:Connect(function()
+				for _, st in ipairs(self.SubTabs) do
+					st.Canvas.Visible = false
+					TweenService:Create(st.Button, TweenInfo.new(0.2), {TextColor3 = Color3.fromRGB(180, 180, 200)}):Play()
+					TweenService:Create(st.Line, TweenInfo.new(0.2), {BackgroundTransparency = 1}):Play()
+				end
+				SubCanvas.Visible = true
+				TweenService:Create(SubBtn, TweenInfo.new(0.2), {TextColor3 = Color3.fromRGB(255, 255, 255)}):Play()
+				TweenService:Create(IndicatorLine, TweenInfo.new(0.2), {BackgroundTransparency = 0}):Play()
+			end)
+
+			if #self.SubTabs == 1 then
+				SubCanvas.Visible = true
+				SubBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+				IndicatorLine.BackgroundTransparency = 0
+			end
+
+			return SubCanvas
+		end
+
+		if #tabs == 1 then
+			TabFrame.Visible = true
+			TabBtn.BackgroundTransparency = 0.5
+			TabBtn.TextTransparency = 0
+			UIStroke_Tab.Transparency = 0.5
+			if iconId then Icon.ImageTransparency = 0 end
+		end
+
+		return TabObject
+	end
+
+	function lib:CreateToggle(title, ParentCanvas, callback)
+		local ToggleFrame = Instance.new("Frame")
+		local UICorner_Toggle = Instance.new("UICorner")
+		local UIStroke_Toggle = Instance.new("UIStroke")
+		local TitleLabel = Instance.new("TextLabel")
+		local Pill = Instance.new("Frame")
+		local PillCorner = Instance.new("UICorner")
+		local PillStroke = Instance.new("UIStroke")
+		local Indicator = Instance.new("Frame")
+		local IndicatorCorner = Instance.new("UICorner")
+		local Button = Instance.new("TextButton")
+
+		ToggleFrame.Name = "Toggle"
+		ToggleFrame.Parent = ParentCanvas
+		ToggleFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 28)
+		ToggleFrame.Size = UDim2.new(0.95, 0, 0, IsMobile and 40 or 45)
+
+		UICorner_Toggle.CornerRadius = UDim.new(0, 8)
+		UICorner_Toggle.Parent = ToggleFrame
+
+		UIStroke_Toggle.Color = Color3.fromRGB(45, 45, 60)
+		UIStroke_Toggle.Thickness = 1
+		UIStroke_Toggle.Parent = ToggleFrame
+
+		TitleLabel.Name = "Title"
+		TitleLabel.Parent = ToggleFrame
+		TitleLabel.BackgroundTransparency = 1.000
+		TitleLabel.Position = UDim2.new(0, 15, 0, 0)
+		TitleLabel.Size = UDim2.new(0.7, 0, 1, 0)
+		TitleLabel.Font = Enum.Font.GothamMedium
+		TitleLabel.Text = title
+		TitleLabel.TextColor3 = Color3.fromRGB(180, 180, 200)
+		TitleLabel.TextSize = IsMobile and 13 or 14
+		TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
+
+		Pill.Name = "Pill"
+		Pill.Parent = ToggleFrame
+		Pill.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
+		Pill.Position = UDim2.new(1, -(IsMobile and 50 or 55), 0.5, -(IsMobile and 9 or 10))
+		Pill.Size = UDim2.new(0, IsMobile and 36 or 40, 0, IsMobile and 18 or 20)
+
+		PillCorner.CornerRadius = UDim.new(1, 0)
+		PillCorner.Parent = Pill
+
+		PillStroke.Color = Color3.fromRGB(60, 60, 80)
+		PillStroke.Thickness = 1
+		PillStroke.Parent = Pill
+
+		Indicator.Name = "Indicator"
+		Indicator.Parent = Pill
+		Indicator.BackgroundColor3 = Color3.fromRGB(180, 180, 200)
+		Indicator.Position = UDim2.new(0, 2, 0.5, 0)
+		Indicator.Size = UDim2.new(0, IsMobile and 14 or 16, 0, IsMobile and 14 or 16)
+		Indicator.AnchorPoint = Vector2.new(0, 0.5)
+
+		IndicatorCorner.CornerRadius = UDim.new(1, 0)
+		IndicatorCorner.Parent = Indicator
+
+		Button.Parent = ToggleFrame
+		Button.BackgroundTransparency = 1
+		Button.Size = UDim2.new(1, 0, 1, 0)
+		Button.Text = ""
+
+		local active = false
+
+		local function hoverState(hovering)
+			if hovering then
+				TweenService:Create(ToggleFrame, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(25, 25, 36)}):Play()
+				TweenService:Create(UIStroke_Toggle, TweenInfo.new(0.15), {Color = Color3.fromRGB(80, 80, 120)}):Play()
+				if not active then
+					TweenService:Create(TitleLabel, TweenInfo.new(0.15), {TextColor3 = Color3.fromRGB(220, 220, 240)}):Play()
+				end
+			else
+				TweenService:Create(ToggleFrame, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(20, 20, 28)}):Play()
+				TweenService:Create(UIStroke_Toggle, TweenInfo.new(0.15), {Color = Color3.fromRGB(45, 45, 60)}):Play()
+				if not active then
+					TweenService:Create(TitleLabel, TweenInfo.new(0.15), {TextColor3 = Color3.fromRGB(180, 180, 200)}):Play()
+				end
+			end
+		end
+
+		Button.MouseEnter:Connect(function() hoverState(true) end)
+		Button.MouseLeave:Connect(function() hoverState(false) end)
+
+		local ToggleObject = {}
+		function ToggleObject:Set(state)
+			active = state
+			if active then
+				TweenService:Create(Indicator, TweenInfo.new(0.25, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {Position = UDim2.new(1, -(IsMobile and 16 or 18), 0.5, 0), BackgroundColor3 = Color3.fromRGB(255, 255, 255)}):Play()
+				TweenService:Create(Pill, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(99, 102, 241)}):Play()
+				TweenService:Create(PillStroke, TweenInfo.new(0.2), {Color = Color3.fromRGB(129, 140, 248)}):Play()
+				TweenService:Create(TitleLabel, TweenInfo.new(0.2), {TextColor3 = Color3.fromRGB(255, 255, 255)}):Play()
+			else
+				TweenService:Create(Indicator, TweenInfo.new(0.25, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {Position = UDim2.new(0, 2, 0.5, 0), BackgroundColor3 = Color3.fromRGB(180, 180, 200)}):Play()
+				TweenService:Create(Pill, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(40, 40, 50)}):Play()
+				TweenService:Create(PillStroke, TweenInfo.new(0.2), {Color = Color3.fromRGB(60, 60, 80)}):Play()
+				TweenService:Create(TitleLabel, TweenInfo.new(0.2), {TextColor3 = Color3.fromRGB(180, 180, 200)}):Play()
+			end
+			callback(active)
+		end
+		
+		function ToggleObject:Get()
+			return active
+		end
+
+		Button.MouseButton1Click:Connect(function()
+			ToggleObject:Set(not active)
+		end)
+		return ToggleObject
+	end
+
+	function lib:CreateButton(title, ParentCanvas, callback)
+		local ButtonFrame = Instance.new("Frame")
+		local UICorner_Btn = Instance.new("UICorner")
+		local UIStroke_Btn = Instance.new("UIStroke")
+		local TitleLabel = Instance.new("TextLabel")
+		local Button = Instance.new("TextButton")
+		local ArrowLabel = Instance.new("TextLabel")
+
+		ButtonFrame.Name = "Button"
+		ButtonFrame.Parent = ParentCanvas
+		ButtonFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 28)
+		ButtonFrame.Size = UDim2.new(0.95, 0, 0, IsMobile and 40 or 45)
+
+		UICorner_Btn.CornerRadius = UDim.new(0, 8)
+		UICorner_Btn.Parent = ButtonFrame
+
+		UIStroke_Btn.Color = Color3.fromRGB(45, 45, 60)
+		UIStroke_Btn.Thickness = 1
+		UIStroke_Btn.Parent = ButtonFrame
+
+		TitleLabel.Name = "Title"
+		TitleLabel.Parent = ButtonFrame
+		TitleLabel.BackgroundTransparency = 1
+		TitleLabel.Position = UDim2.new(0, 15, 0, 0)
+		TitleLabel.Size = UDim2.new(0.8, 0, 1, 0)
+		TitleLabel.Font = Enum.Font.GothamMedium
+		TitleLabel.Text = title
+		TitleLabel.TextColor3 = Color3.fromRGB(180, 180, 200)
+		TitleLabel.TextSize = IsMobile and 13 or 14
+		TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
+
+		ArrowLabel.Parent = ButtonFrame
+		ArrowLabel.BackgroundTransparency = 1
+		ArrowLabel.Position = UDim2.new(1, -35, 0, 0)
+		ArrowLabel.Size = UDim2.new(0, 25, 1, 0)
+		ArrowLabel.Font = Enum.Font.GothamBold
+		ArrowLabel.Text = "›"
+		ArrowLabel.TextColor3 = Color3.fromRGB(99, 102, 241)
+		ArrowLabel.TextSize = 22
+
+		Button.Parent = ButtonFrame
+		Button.BackgroundTransparency = 1
+		Button.Size = UDim2.new(1, 0, 1, 0)
+		Button.Text = ""
+
+		Button.MouseEnter:Connect(function()
+			TweenService:Create(ButtonFrame, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(25, 25, 38)}):Play()
+			TweenService:Create(UIStroke_Btn, TweenInfo.new(0.15), {Color = Color3.fromRGB(99, 102, 241)}):Play()
+			TweenService:Create(TitleLabel, TweenInfo.new(0.15), {TextColor3 = Color3.fromRGB(255, 255, 255)}):Play()
+			TweenService:Create(ArrowLabel, TweenInfo.new(0.15), {TextColor3 = Color3.fromRGB(168, 85, 247)}):Play()
+		end)
+
+		Button.MouseLeave:Connect(function()
+			TweenService:Create(ButtonFrame, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(20, 20, 28)}):Play()
+			TweenService:Create(UIStroke_Btn, TweenInfo.new(0.15), {Color = Color3.fromRGB(45, 45, 60)}):Play()
+			TweenService:Create(TitleLabel, TweenInfo.new(0.15), {TextColor3 = Color3.fromRGB(180, 180, 200)}):Play()
+			TweenService:Create(ArrowLabel, TweenInfo.new(0.15), {TextColor3 = Color3.fromRGB(99, 102, 241)}):Play()
+		end)
+
+		Button.MouseButton1Click:Connect(function()
+			TweenService:Create(ButtonFrame, TweenInfo.new(0.1), {BackgroundColor3 = Color3.fromRGB(35, 35, 55)}):Play()
+			task.delay(0.1, function()
+				TweenService:Create(ButtonFrame, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(25, 25, 38)}):Play()
+			end)
+			if callback then callback() end
+		end)
+		
+		Button.TouchTap:Connect(function()
+			if callback then callback() end
+		end)
+	end
+
+	function lib:CreateSlider(title, ParentCanvas, min, max, default, callback)
+		local SliderFrame = Instance.new("Frame")
+		local UICorner_Sld = Instance.new("UICorner")
+		local UIStroke_Sld = Instance.new("UIStroke")
+		local TitleLabel = Instance.new("TextLabel")
+		local ValueLabel = Instance.new("TextLabel")
+		local TrackBack = Instance.new("Frame")
+		local UICorner_Track = Instance.new("UICorner")
+		local Fill = Instance.new("Frame")
+		local UICorner_Fill = Instance.new("UICorner")
+		local Handle = Instance.new("Frame")
+		local UICorner_Handle = Instance.new("UICorner")
+		local HandleStroke = Instance.new("UIStroke")
+		local Button = Instance.new("TextButton")
+
+		SliderFrame.Name = "Slider"
+		SliderFrame.Parent = ParentCanvas
+		SliderFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 28)
+		SliderFrame.Size = UDim2.new(0.95, 0, 0, IsMobile and 50 or 55)
+
+		UICorner_Sld.CornerRadius = UDim.new(0, 8)
+		UICorner_Sld.Parent = SliderFrame
+
+		UIStroke_Sld.Color = Color3.fromRGB(45, 45, 60)
+		UIStroke_Sld.Thickness = 1
+		UIStroke_Sld.Parent = SliderFrame
+
+		TitleLabel.Name = "Title"
+		TitleLabel.Parent = SliderFrame
+		TitleLabel.BackgroundTransparency = 1
+		TitleLabel.Position = UDim2.new(0, 15, 0, 0)
+		TitleLabel.Size = UDim2.new(0.6, 0, 0, IsMobile and 26 or 28)
+		TitleLabel.Font = Enum.Font.GothamMedium
+		TitleLabel.Text = title
+		TitleLabel.TextColor3 = Color3.fromRGB(180, 180, 200)
+		TitleLabel.TextSize = IsMobile and 13 or 14
+		TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
+
+		ValueLabel.Name = "Value"
+		ValueLabel.Parent = SliderFrame
+		ValueLabel.BackgroundTransparency = 1
+		ValueLabel.Position = UDim2.new(1, -55, 0, 0)
+		ValueLabel.Size = UDim2.new(0, 40, 0, 28)
+		ValueLabel.Font = Enum.Font.GothamBold
+		ValueLabel.Text = tostring(default)
+		ValueLabel.TextColor3 = Color3.fromRGB(99, 102, 241)
+		ValueLabel.TextSize = 13
+		ValueLabel.TextXAlignment = Enum.TextXAlignment.Right
+
+		TrackBack.Name = "TrackBack"
+		TrackBack.Parent = SliderFrame
+		TrackBack.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
+		TrackBack.BorderSizePixel = 0
+		TrackBack.Position = UDim2.new(0, 15, 0, IsMobile and 32 or 38)
+		TrackBack.Size = UDim2.new(1, -30, 0, 5)
+
+		UICorner_Track.CornerRadius = UDim.new(1, 0)
+		UICorner_Track.Parent = TrackBack
+
+		Fill.Name = "Fill"
+		Fill.Parent = TrackBack
+		Fill.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+		Fill.BorderSizePixel = 0
+		Fill.Size = UDim2.new(0, 0, 1, 0)
+
+		local FillGradient = Instance.new("UIGradient")
+		FillGradient.Color = ColorSequence.new({
+			ColorSequenceKeypoint.new(0, Color3.fromRGB(99, 102, 241)),
+			ColorSequenceKeypoint.new(1, Color3.fromRGB(168, 85, 247))
+		})
+		FillGradient.Parent = Fill
+
+		UICorner_Fill.CornerRadius = UDim.new(1, 0)
+		UICorner_Fill.Parent = Fill
+
+		Handle.Name = "Handle"
+		Handle.Parent = TrackBack
+		Handle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+		Handle.BorderSizePixel = 0
+		Handle.AnchorPoint = Vector2.new(0.5, 0.5)
+		Handle.Position = UDim2.new(0, 0, 0.5, 0)
+		Handle.Size = UDim2.new(0, 12, 0, 12)
+
+		UICorner_Handle.CornerRadius = UDim.new(1, 0)
+		UICorner_Handle.Parent = Handle
+
+		HandleStroke.Color = Color3.fromRGB(99, 102, 241)
+		HandleStroke.Thickness = 1
+		HandleStroke.Parent = Handle
+
+		Button.Parent = SliderFrame
+		Button.BackgroundTransparency = 1
+		Button.Size = UDim2.new(1, 0, 1, 0)
+		Button.Text = ""
+		Button.ZIndex = 5
+
+		local currentValue = default
+		local isDragging = false
+
+		local function updateSlider(customPct)
+			local pct = customPct or math.clamp((currentValue - min) / (max - min), 0, 1)
+			Fill.Size = UDim2.new(pct, 0, 1, 0)
+			Handle.Position = UDim2.new(pct, 0, 0.5, 0)
+			local displayValue = math.floor(currentValue)
+			ValueLabel.Text = tostring(displayValue)
+			if callback then callback(displayValue) end
+		end
+
+		local function processInput(input)
+			local trackX = TrackBack.AbsolutePosition.X
+			local trackW = TrackBack.AbsoluteSize.X
+			local pct = math.clamp((input.Position.X - trackX) / trackW, 0, 1)
+			currentValue = min + pct * (max - min)
+			updateSlider(pct)
+		end
+
+		Button.MouseEnter:Connect(function()
+			TweenService:Create(SliderFrame, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(25, 25, 38)}):Play()
+			TweenService:Create(UIStroke_Sld, TweenInfo.new(0.15), {Color = Color3.fromRGB(80, 80, 110)}):Play()
+			TweenService:Create(Handle, TweenInfo.new(0.15), {Size = UDim2.new(0, 14, 0, 14)}):Play()
+		end)
+
+		Button.MouseLeave:Connect(function()
+			if not isDragging then
+				TweenService:Create(SliderFrame, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(20, 20, 28)}):Play()
+				TweenService:Create(UIStroke_Sld, TweenInfo.new(0.15), {Color = Color3.fromRGB(45, 45, 60)}):Play()
+				TweenService:Create(Handle, TweenInfo.new(0.15), {Size = UDim2.new(0, 12, 0, 12)}):Play()
+			end
+		end)
+
+		Button.InputBegan:Connect(function(input)
+			if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+				isDragging = true
+				processInput(input)
+			end
+		end)
+
+		UserInputService.InputChanged:Connect(function(input)
+			if isDragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+				processInput(input)
+			end
+		end)
+
+		UserInputService.InputEnded:Connect(function(input)
+			if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+				isDragging = false
+				TweenService:Create(SliderFrame, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(20, 20, 28)}):Play()
+				TweenService:Create(UIStroke_Sld, TweenInfo.new(0.15), {Color = Color3.fromRGB(45, 45, 60)}):Play()
+				TweenService:Create(Handle, TweenInfo.new(0.15), {Size = UDim2.new(0, 12, 0, 12)}):Play()
+			end
+		end)
+
+		currentValue = default
+		updateSlider()
+
+		local SliderObject = {}
+		function SliderObject:Set(val)
+			currentValue = math.clamp(val, min, max)
+			updateSlider()
+		end
+		
+		function SliderObject:Get()
+			return currentValue
+		end
+		return SliderObject
+	end
+
+	function lib:CreateDropdown(title, ParentCanvas, options, callback)
+		local DropFrame = Instance.new("Frame")
+		local UICorner_Drop = Instance.new("UICorner")
+		local UIStroke_Drop = Instance.new("UIStroke")
+		local TitleLabel = Instance.new("TextLabel")
+		local SelectedLabel = Instance.new("TextLabel")
+		local ArrowLabel = Instance.new("TextLabel")
+		local OptionHolder = Instance.new("Frame")
+		local UICorner_Opts = Instance.new("UICorner")
+		local UIStroke_Opts = Instance.new("UIStroke")
+		local UIListLayout_Opts = Instance.new("UIListLayout")
+		local Button = Instance.new("TextButton")
+
+		DropFrame.Name = "Dropdown"
+		DropFrame.Parent = ParentCanvas
+		DropFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 28)
+		DropFrame.Size = UDim2.new(0.95, 0, 0, IsMobile and 40 or 45)
+		DropFrame.ClipsDescendants = false
+		DropFrame.ZIndex = 10
+
+		UICorner_Drop.CornerRadius = UDim.new(0, 8)
+		UICorner_Drop.Parent = DropFrame
+
+		UIStroke_Drop.Color = Color3.fromRGB(45, 45, 60)
+		UIStroke_Drop.Thickness = 1
+		UIStroke_Drop.Parent = DropFrame
+
+		TitleLabel.Name = "Title"
+		TitleLabel.Parent = DropFrame
+		TitleLabel.BackgroundTransparency = 1
+		TitleLabel.Position = UDim2.new(0, 15, 0, 0)
+		TitleLabel.Size = UDim2.new(0.5, 0, 1, 0)
+		TitleLabel.Font = Enum.Font.GothamMedium
+		TitleLabel.Text = title
+		TitleLabel.TextColor3 = Color3.fromRGB(180, 180, 200)
+		TitleLabel.TextSize = 14
+		TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
+		TitleLabel.ZIndex = 10
+
+		SelectedLabel.Name = "Selected"
+		SelectedLabel.Parent = DropFrame
+		SelectedLabel.BackgroundTransparency = 1
+		SelectedLabel.Position = UDim2.new(0.5, 0, 0, 0)
+		SelectedLabel.Size = UDim2.new(0.4, 0, 1, 0)
+		SelectedLabel.Font = Enum.Font.GothamMedium
+		SelectedLabel.Text = options[1] or ""
+		SelectedLabel.TextColor3 = Color3.fromRGB(99, 102, 241)
+		SelectedLabel.TextSize = 13
+		SelectedLabel.TextXAlignment = Enum.TextXAlignment.Right
+		SelectedLabel.ZIndex = 10
+
+		ArrowLabel.Name = "Arrow"
+		ArrowLabel.Parent = DropFrame
+		ArrowLabel.BackgroundTransparency = 1
+		ArrowLabel.Position = UDim2.new(1, -25, 0, 0)
+		ArrowLabel.Size = UDim2.new(0, 20, 1, 0)
+		ArrowLabel.Font = Enum.Font.SourceSansBold
+		ArrowLabel.Text = "⌄"
+		ArrowLabel.TextColor3 = Color3.fromRGB(99, 102, 241)
+		ArrowLabel.TextSize = 16
+		ArrowLabel.ZIndex = 10
+
+		OptionHolder.Name = "OptionHolder"
+		OptionHolder.Parent = DropFrame
+		OptionHolder.BackgroundColor3 = Color3.fromRGB(16, 16, 24)
+		OptionHolder.BorderSizePixel = 0
+		OptionHolder.Position = UDim2.new(0, 0, 1, 5)
+		OptionHolder.Size = UDim2.new(1, 0, 0, 0)
+		OptionHolder.Visible = false
+		OptionHolder.ZIndex = 20
+		OptionHolder.ClipsDescendants = true
+
+		UICorner_Opts.CornerRadius = UDim.new(0, 8)
+		UICorner_Opts.Parent = OptionHolder
+
+		UIStroke_Opts.Color = Color3.fromRGB(60, 60, 80)
+		UIStroke_Opts.Thickness = 1
+		UIStroke_Opts.Parent = OptionHolder
+
+		UIListLayout_Opts.Parent = OptionHolder
+		UIListLayout_Opts.HorizontalAlignment = Enum.HorizontalAlignment.Center
+		UIListLayout_Opts.SortOrder = Enum.SortOrder.LayoutOrder
+		UIListLayout_Opts.Padding = UDim.new(0, 3)
+
+		Button.Parent = DropFrame
+		Button.BackgroundTransparency = 1
+		Button.Size = UDim2.new(1, 0, 1, 0)
+		Button.Text = ""
+		Button.ZIndex = 15
+
+		local isOpen = false
+
+		local function hoverDrop(hovering)
+			if hovering then
+				TweenService:Create(DropFrame, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(25, 25, 38)}):Play()
+				TweenService:Create(UIStroke_Drop, TweenInfo.new(0.15), {Color = Color3.fromRGB(99, 102, 241)}):Play()
+			else
+				TweenService:Create(DropFrame, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(20, 20, 28)}):Play()
+				TweenService:Create(UIStroke_Drop, TweenInfo.new(0.15), {Color = Color3.fromRGB(45, 45, 60)}):Play()
+			end
+		end
+
+		Button.MouseEnter:Connect(function() hoverDrop(true) end)
+		Button.MouseLeave:Connect(function() hoverDrop(false) end)
+
+		local function createOptionButtons(newOptions, newCallback)
+			for _, child in ipairs(OptionHolder:GetChildren()) do
+				if child:IsA("TextButton") then
+					child:Destroy()
+				end
+			end
+			
+			for _, opt in ipairs(newOptions) do
+				local OptBtn = Instance.new("TextButton")
+				local UICorner_Opt = Instance.new("UICorner")
+				local UIStroke_Opt = Instance.new("UIStroke")
+
+				OptBtn.Name = opt
+				OptBtn.Parent = OptionHolder
+				OptBtn.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
+				OptBtn.BorderSizePixel = 0
+				OptBtn.Size = UDim2.new(0.95, 0, 0, 32)
+				OptBtn.Font = Enum.Font.GothamMedium
+				OptBtn.Text = opt
+				OptBtn.TextColor3 = Color3.fromRGB(180, 180, 200)
+				OptBtn.TextSize = 13
+				OptBtn.ZIndex = 25
+
+				UICorner_Opt.CornerRadius = UDim.new(0, 6)
+				UICorner_Opt.Parent = OptBtn
+
+				UIStroke_Opt.Color = Color3.fromRGB(45, 45, 60)
+				UIStroke_Opt.Thickness = 1
+				UIStroke_Opt.Parent = OptBtn
+
+				OptBtn.MouseButton1Click:Connect(function()
+					SelectedLabel.Text = opt
+					isOpen = false
+					OptionHolder.Visible = false
+					TweenService:Create(ArrowLabel, TweenInfo.new(0.2), {Rotation = 0}):Play()
+					if newCallback then newCallback(opt) elseif callback then callback(opt) end
+				end)
+
+				OptBtn.MouseEnter:Connect(function()
+					TweenService:Create(OptBtn, TweenInfo.new(0.1), {BackgroundColor3 = Color3.fromRGB(35, 35, 55)}):Play()
+					TweenService:Create(OptBtn, TweenInfo.new(0.1), {TextColor3 = Color3.fromRGB(255, 255, 255)}):Play()
+					TweenService:Create(UIStroke_Opt, TweenInfo.new(0.1), {Color = Color3.fromRGB(99, 102, 241)}):Play()
+				end)
+				
+				OptBtn.MouseLeave:Connect(function()
+					TweenService:Create(OptBtn, TweenInfo.new(0.1), {BackgroundColor3 = Color3.fromRGB(25, 25, 35)}):Play()
+					TweenService:Create(OptBtn, TweenInfo.new(0.1), {TextColor3 = Color3.fromRGB(180, 180, 200)}):Play()
+					TweenService:Create(UIStroke_Opt, TweenInfo.new(0.1), {Color = Color3.fromRGB(45, 45, 60)}):Play()
+				end)
+			end
+		end
+
+		createOptionButtons(options)
+
+		local totalHeight = #options * 35 + 5
+
+		Button.MouseButton1Click:Connect(function()
+			isOpen = not isOpen
+			if isOpen then
+				OptionHolder.Visible = true
+				OptionHolder.Size = UDim2.new(1, 0, 0, 0)
+				TweenService:Create(OptionHolder, TweenInfo.new(0.25, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {Size = UDim2.new(1, 0, 0, totalHeight)}):Play()
+				TweenService:Create(ArrowLabel, TweenInfo.new(0.2), {Rotation = 180}):Play()
+			else
+				TweenService:Create(OptionHolder, TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {Size = UDim2.new(1, 0, 0, 0)}):Play()
+				TweenService:Create(ArrowLabel, TweenInfo.new(0.2), {Rotation = 0}):Play()
+				task.delay(0.2, function() OptionHolder.Visible = false end)
+			end
+		end)
+
+		local DropdownObject = {}
+		
+		function DropdownObject:Set(value)
+			SelectedLabel.Text = value
+			if callback then callback(value) end
+		end
+		
+		function DropdownObject:Get()
+			return SelectedLabel.Text
+		end
+
+		function DropdownObject:Refresh(newOptions, newCallback)
+			if newCallback then callback = newCallback end
+			options = newOptions
+			createOptionButtons(options, callback)
+			totalHeight = #options * 35 + 5
+			SelectedLabel.Text = options[1] or ""
+		end
+
+		return DropdownObject
+	end
+
+	function lib:CreateInput(title, ParentCanvas, placeholder, callback)
+		local InputFrame = Instance.new("Frame")
+		local UICorner_Inp = Instance.new("UICorner")
+		local UIStroke_Inp = Instance.new("UIStroke")
+		local TitleLabel = Instance.new("TextLabel")
+		local InputBox = Instance.new("TextBox")
+		local UICorner_Box = Instance.new("UICorner")
+		local UIStroke_Box = Instance.new("UIStroke")
+
+		InputFrame.Name = "Input"
+		InputFrame.Parent = ParentCanvas
+		InputFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 28)
+		InputFrame.Size = UDim2.new(0.95, 0, 0, IsMobile and 40 or 45)
+
+		UICorner_Inp.CornerRadius = UDim.new(0, 8)
+		UICorner_Inp.Parent = InputFrame
+
+		UIStroke_Inp.Color = Color3.fromRGB(45, 45, 60)
+		UIStroke_Inp.Thickness = 1
+		UIStroke_Inp.Parent = InputFrame
+
+		TitleLabel.Name = "Title"
+		TitleLabel.Parent = InputFrame
+		TitleLabel.BackgroundTransparency = 1
+		TitleLabel.Position = UDim2.new(0, 15, 0, 0)
+		TitleLabel.Size = UDim2.new(0.45, 0, 1, 0)
+		TitleLabel.Font = Enum.Font.GothamMedium
+		TitleLabel.Text = title
+		TitleLabel.TextColor3 = Color3.fromRGB(180, 180, 200)
+		TitleLabel.TextSize = IsMobile and 13 or 14
+		TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
+
+		InputBox.Name = "InputBox"
+		InputBox.Parent = InputFrame
+		InputBox.BackgroundColor3 = Color3.fromRGB(30, 30, 42)
+		InputBox.BorderSizePixel = 0
+		InputBox.Position = UDim2.new(0.5, 0, 0.5, 0)
+		InputBox.Size = UDim2.new(0.45, 0, 0, 28)
+		InputBox.AnchorPoint = Vector2.new(0, 0.5)
+		InputBox.Font = Enum.Font.GothamMedium
+		InputBox.PlaceholderText = placeholder or "Enter text..."
+		InputBox.PlaceholderColor3 = Color3.fromRGB(90, 90, 110)
+		InputBox.Text = ""
+		InputBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+		InputBox.TextSize = 13
+		InputBox.ClearTextOnFocus = false
+
+		UICorner_Box.CornerRadius = UDim.new(0, 6)
+		UICorner_Box.Parent = InputBox
+
+		UIStroke_Box.Color = Color3.fromRGB(50, 50, 70)
+		UIStroke_Box.Thickness = 1
+		UIStroke_Box.Parent = InputBox
+
+		InputFrame.MouseEnter:Connect(function()
+			TweenService:Create(InputFrame, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(25, 25, 38)}):Play()
+			TweenService:Create(UIStroke_Inp, TweenInfo.new(0.15), {Color = Color3.fromRGB(80, 80, 110)}):Play()
+		end)
+		
+		InputFrame.MouseLeave:Connect(function()
+			TweenService:Create(InputFrame, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(20, 20, 28)}):Play()
+			TweenService:Create(UIStroke_Inp, TweenInfo.new(0.15), {Color = Color3.fromRGB(45, 45, 60)}):Play()
+		end)
+
+		InputBox.Focused:Connect(function()
+			TweenService:Create(InputBox, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(35, 35, 55)}):Play()
+			TweenService:Create(UIStroke_Box, TweenInfo.new(0.2), {Color = Color3.fromRGB(99, 102, 241)}):Play()
+		end)
+
+		InputBox.FocusLost:Connect(function(enterPressed)
+			TweenService:Create(InputBox, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(30, 30, 42)}):Play()
+			TweenService:Create(UIStroke_Box, TweenInfo.new(0.2), {Color = Color3.fromRGB(50, 50, 70)}):Play()
+			if callback then
+				callback(InputBox.Text)
+			end
+		end)
+
+		local InputObject = {}
+		function InputObject:Set(value)
+			InputBox.Text = value
+			if callback then callback(value) end
+		end
+		
+		function InputObject:Get()
+			return InputBox.Text
+		end
+		return InputObject
+	end
+
+	function lib:CreateLabel(title, ParentCanvas)
+		local LabelFrame = Instance.new("Frame")
+		local UICorner_Lbl = Instance.new("UICorner")
+		local UIStroke_Lbl = Instance.new("UIStroke")
+		local TitleLabel = Instance.new("TextLabel")
+		local LeftAccent = Instance.new("Frame")
+
+		LabelFrame.Name = "Label"
+		LabelFrame.Parent = ParentCanvas
+		LabelFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 28)
+		LabelFrame.Size = UDim2.new(0.95, 0, 0, IsMobile and 32 or 35)
+
+		UICorner_Lbl.CornerRadius = UDim.new(0, 8)
+		UICorner_Lbl.Parent = LabelFrame
+
+		UIStroke_Lbl.Color = Color3.fromRGB(40, 40, 55)
+		UIStroke_Lbl.Thickness = 1
+		UIStroke_Lbl.Parent = LabelFrame
+
+		LeftAccent.Name = "LeftAccent"
+		LeftAccent.Parent = LabelFrame
+		LeftAccent.BackgroundColor3 = Color3.fromRGB(99, 102, 241)
+		LeftAccent.BorderSizePixel = 0
+		LeftAccent.Position = UDim2.new(0, 0, 0.15, 0)
+		LeftAccent.Size = UDim2.new(0, 4, 0.7, 0)
+
+		local AccentCorner = Instance.new("UICorner")
+		AccentCorner.CornerRadius = UDim.new(1, 0)
+		AccentCorner.Parent = LeftAccent
+
+		local AccentGradient = Instance.new("UIGradient")
+		AccentGradient.Color = ColorSequence.new({
+			ColorSequenceKeypoint.new(0, Color3.fromRGB(99, 102, 241)),
+			ColorSequenceKeypoint.new(1, Color3.fromRGB(168, 85, 247))
+		})
+		AccentGradient.Parent = LeftAccent
+
+		TitleLabel.Name = "Title"
+		TitleLabel.Parent = LabelFrame
+		TitleLabel.BackgroundTransparency = 1
+		TitleLabel.Position = UDim2.new(0, 15, 0, 0)
+		TitleLabel.Size = UDim2.new(1, -30, 1, 0)
+		TitleLabel.Font = Enum.Font.GothamMedium
+		TitleLabel.Text = title
+		TitleLabel.TextColor3 = Color3.fromRGB(180, 180, 200)
+		TitleLabel.TextSize = 14
+		TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
+
+		return LabelFrame
+	end
+
+	return lib
+end
+
+return lib
