@@ -8,17 +8,22 @@ local run = game:GetService("RunService")
 local tween = game:GetService("TweenService")
 local tweeninfo = TweenInfo.new
 
+-- device configuration
+local IsMobile = input.TouchEnabled
+local NavWidth = IsMobile and 95 or 150
+local TopBarHeight = IsMobile and 38 or 50
+
 -- additional
 local utility = {}
 
--- themes (Darkened the contrast panels further to make the UI completely black and sleek)
+-- themes (Absolute black theme)
 local objects = {}
 local themes = {
-	Background = Color3.fromRGB(5, 5, 5), 
+	Background = Color3.fromRGB(0, 0, 0), 
 	Glow = Color3.fromRGB(0, 0, 0), 
 	Accent = Color3.fromRGB(99, 102, 241), 
-	LightContrast = Color3.fromRGB(12, 12, 12), 
-	DarkContrast = Color3.fromRGB(8, 8, 8),  
+	LightContrast = Color3.fromRGB(6, 6, 6), 
+	DarkContrast = Color3.fromRGB(3, 3, 3),  
 	TextColor = Color3.fromRGB(255, 255, 255)
 }
 
@@ -118,7 +123,7 @@ do
 		end)
 		
 		input.InputEnded:Connect(function(key)
-			if key.UserInputType == Enum.UserInputType.MouseButton1 then
+			if key.UserInputType == Enum.UserInputType.MouseButton1 or key.UserInputType == Enum.UserInputType.Touch then
 				for i, callback in pairs(self.ended) do
 					callback()
 				end
@@ -160,7 +165,7 @@ do
 		local dragInput, mousePos, framePos
 
 		frame.InputBegan:Connect(function(input)
-			if input.UserInputType == Enum.UserInputType.MouseButton1 then
+			if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
 				dragging = true
 				mousePos = input.Position
 				framePos = parent.Position
@@ -174,7 +179,7 @@ do
 		end)
 
 		frame.InputChanged:Connect(function(input)
-			if input.UserInputType == Enum.UserInputType.MouseMovement then
+			if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
 				dragInput = input
 			end
 		end)
@@ -206,13 +211,18 @@ do
 	function library.new(title)
 		local container = utility:Create("ScreenGui", {
 			Name = title,
-			Parent = game.CoreGui
+			Parent = player:WaitForChild("PlayerGui"),
+			ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
+			DisplayOrder = 999999999,
+			ResetOnSpawn = false,
+			IgnoreGuiInset = true
 		}, {
 			utility:Create("ImageLabel", {
 				Name = "Main",
 				BackgroundTransparency = 1,
-				Position = UDim2.new(0.25, 0, 0.052435593, 0),
-				Size = UDim2.new(0, 511, 0, 428),
+				Position = UDim2.new(0.5, 0, 0.5, 0),
+				AnchorPoint = Vector2.new(0.5, 0.5),
+				Size = IsMobile and UDim2.new(0.58, 0, 0.87, 0) or UDim2.new(0.54, 0, 0.54, 0),
 				Image = "rbxassetid://4641149554",
 				ImageColor3 = themes.Background,
 				ScaleType = Enum.ScaleType.Slice,
@@ -233,8 +243,8 @@ do
 					Name = "Pages",
 					BackgroundTransparency = 1,
 					ClipsDescendants = true,
-					Position = UDim2.new(0, 0, 0, 38),
-					Size = UDim2.new(0, 126, 1, -38),
+					Position = UDim2.new(0, 0, 0, TopBarHeight),
+					Size = UDim2.new(0, NavWidth, 1, -TopBarHeight),
 					ZIndex = 3,
 					Image = "rbxassetid://5012534273",
 					ImageColor3 = themes.DarkContrast,
@@ -260,10 +270,10 @@ do
 					Name = "TopBar",
 					BackgroundTransparency = 1,
 					ClipsDescendants = true,
-					Size = UDim2.new(1, 0, 0, 38),
+					Size = UDim2.new(1, 0, 0, TopBarHeight),
 					ZIndex = 5,
 					Image = "rbxassetid://4595286933",
-					ImageColor3 = themes.Background, -- Solid black TopBar background
+					ImageColor3 = themes.Background,
 					ScaleType = Enum.ScaleType.Slice,
 					SliceCenter = Rect.new(4, 4, 296, 296)
 				}, {
@@ -271,13 +281,13 @@ do
 						Name = "Title",
 						AnchorPoint = Vector2.new(0, 0.5),
 						BackgroundTransparency = 1,
-						Position = UDim2.new(0, 12, 0, 19),
-						Size = UDim2.new(1, -46, 0, 16),
+						Position = UDim2.new(0, 12, 0, TopBarHeight / 2),
+						Size = UDim2.new(1, -120, 0, 16),
 						ZIndex = 5,
 						Font = Enum.Font.GothamBold,
 						Text = title,
 						TextColor3 = themes.TextColor,
-						TextSize = 14,
+						TextSize = IsMobile and 17 or 18,
 						TextXAlignment = Enum.TextXAlignment.Left
 					}),
 					utility:Create("Frame", { -- Accent strip
@@ -287,10 +297,93 @@ do
 						Position = UDim2.new(0, 0, 1, -2),
 						Size = UDim2.new(1, 0, 0, 2),
 						ZIndex = 6
+					}),
+					utility:Create("ImageButton", {
+						Name = "ExitButton",
+						BackgroundTransparency = 1,
+						Position = UDim2.new(1, -35, 0.5, -(IsMobile and 11 or 13)),
+						Size = UDim2.new(0, IsMobile and 22 or 26, 0, IsMobile and 22 or 26),
+						ZIndex = 6,
+						Image = "rbxassetid://5012538583",
+						ImageColor3 = themes.TextColor,
+						ImageTransparency = 0.5
+					}),
+					utility:Create("ImageButton", {
+						Name = "MinimizeButton",
+						BackgroundTransparency = 1,
+						Position = UDim2.new(1, -65, 0.5, -(IsMobile and 11 or 13)),
+						Size = UDim2.new(0, IsMobile and 22 or 26, 0, IsMobile and 22 or 26),
+						ZIndex = 6,
+						Image = "rbxassetid://5028857472",
+						ImageColor3 = themes.LightContrast,
+						ImageTransparency = 0.5
+					}, {
+						utility:Create("Frame", {
+							Name = "Line",
+							AnchorPoint = Vector2.new(0.5, 0.5),
+							BackgroundColor3 = themes.TextColor,
+							BackgroundTransparency = 0.5,
+							BorderSizePixel = 0,
+							Position = UDim2.new(0.5, 0, 0.5, 0),
+							Size = UDim2.new(0, 12, 0, 2),
+							ZIndex = 7
+						})
 					})
 				})
 			})
 		})
+		
+		local mainFrame = container.Main
+		local exitBtn = mainFrame.TopBar.ExitButton
+		local minBtn = mainFrame.TopBar.MinimizeButton
+		
+		exitBtn.MouseButton1Click:Connect(function()
+			mainFrame.Visible = false
+		end)
+		
+		minBtn.MouseButton1Click:Connect(function()
+			mainFrame.Visible = false
+			if not IsMobile and library.OnMinimize then
+				pcall(library.OnMinimize)
+			end
+		end)
+		
+		local MobileCard = utility:Create("TextButton", {
+			Name = "MobileCard",
+			Parent = container,
+			BackgroundColor3 = themes.DarkContrast,
+			BorderSizePixel = 0,
+			Position = UDim2.new(0.05, 0, 0.05, 0),
+			Size = UDim2.new(0, 120, 0, 50),
+			AutoButtonColor = false,
+			Text = title,
+			TextColor3 = themes.TextColor,
+			Font = Enum.Font.GothamBold,
+			TextSize = 18,
+			Visible = false,
+			ZIndex = 10
+		}, {
+			utility:Create("UICorner", {
+				CornerRadius = UDim.new(0, 8)
+			})
+		})
+		
+		utility:DraggingEnabled(MobileCard)
+		
+		mainFrame:GetPropertyChangedSignal("Visible"):Connect(function()
+			if mainFrame.Visible then
+				MobileCard.Visible = false
+			else
+				MobileCard.Visible = IsMobile
+			end
+		end)
+		
+		MobileCard.MouseButton1Click:Connect(function()
+			mainFrame.Visible = true
+		end)
+		MobileCard.TouchTap:Connect(function()
+			mainFrame.Visible = true
+		end)
 		
 		utility:InitializeKeybind()
 		utility:DraggingEnabled(container.Main.TopBar, container.Main)
@@ -349,8 +442,8 @@ do
 			Active = true,
 			BackgroundTransparency = 1,
 			BorderSizePixel = 0,
-			Position = UDim2.new(0, 134, 0, 46),
-			Size = UDim2.new(1, -142, 1, -56),
+			Position = UDim2.new(0, NavWidth + 8, 0, TopBarHeight + 8),
+			Size = UDim2.new(1, -(NavWidth + 16), 1, -(TopBarHeight + 18)),
 			CanvasSize = UDim2.new(0, 0, 0, 466),
 			ScrollBarThickness = 3,
 			ScrollBarImageColor3 = themes.DarkContrast,
@@ -439,17 +532,30 @@ do
 		return section
 	end
 	
-	-- functions
+	-- Theme changes
 	function library:setTheme(theme, color3)
+		print("[Venyx Debug] setTheme called for:", theme, "with color:", tostring(color3))
 		themes[theme] = color3
 		
-		for property, objects in pairs(objects[theme] or {}) do
-			for i, object in pairs(objects) do
+		local count = 0
+		for property, objectsList in pairs(objects[theme] or {}) do
+			for i, object in pairs(objectsList) do
 				if not object.Parent or (object.Name == "Button" and object.Parent.Name == "ColorPicker") then
-					objects[i] = nil
+					objectsList[i] = nil
 				else
 					object[property] = color3
+					count = count + 1
 				end
+			end
+		end
+		print("[Venyx Debug] Updated properties count:", count)
+		
+		-- Force update active page button text/icon color to the new accent color
+		if theme == "Accent" and self.focusedPage then
+			local button = self.focusedPage.button
+			button.Title.TextColor3 = color3
+			if button:FindFirstChild("Icon") then
+				button.Icon.ImageColor3 = color3
 			end
 		end
 	end
@@ -465,12 +571,12 @@ do
 		
 		if self.position then
 			utility:Tween(container, {
-				Size = UDim2.new(0, 511, 0, 428),
+				Size = IsMobile and UDim2.new(0.58, 0, 0.87, 0) or UDim2.new(0.54, 0, 0.54, 0),
 				Position = self.position
 			}, 0.2)
 			wait(0.2)
 			
-			utility:Tween(topbar, {Size = UDim2.new(1, 0, 0, 38)}, 0.2)
+			utility:Tween(topbar, {Size = UDim2.new(1, 0, 0, TopBarHeight)}, 0.2)
 			wait(0.2)
 			
 			container.ClipsDescendants = false
@@ -483,8 +589,8 @@ do
 			wait(0.2)
 			
 			utility:Tween(container, {
-				Size = UDim2.new(0, 511, 0, 0),
-				Position = self.position + UDim2.new(0, 0, 0, 428)
+				Size = IsMobile and UDim2.new(0.58, 0, 0, 0) or UDim2.new(0.54, 0, 0, 0),
+				Position = self.position + UDim2.new(0, 0, 0, IsMobile and 400 or 300) -- relative shift down
 			}, 0.2)
 			wait(0.2)
 		end
@@ -757,10 +863,12 @@ do
 		table.insert(self.modules, toggle)
 		
 		local active = default
+		toggle.Value = active
 		self:updateToggle(toggle, nil, active)
 		
 		toggle.MouseButton1Click:Connect(function()
 			active = not active
+			toggle.Value = active
 			self:updateToggle(toggle, nil, active)
 			
 			if callback then
@@ -830,6 +938,7 @@ do
 		
 		local button = textbox.Button
 		local input = button.Textbox
+		textbox.Value = default or ""
 		
 		textbox.MouseButton1Click:Connect(function()
 			if textbox.Button.Size ~= UDim2.new(0, 100, 0, 16) then
@@ -851,6 +960,7 @@ do
 				utility:Pop(button, 10)
 			end
 			
+			textbox.Value = input.Text
 			if callback then
 				callback(input.Text, nil, function(...)
 					self:updateTextbox(textbox, ...)
@@ -866,6 +976,7 @@ do
 				Position = UDim2.new(1, -110, 0.5, -8)
 			}, 0.2)
 			
+			textbox.Value = input.Text
 			if callback then
 				callback(input.Text, true, function(...)
 					self:updateTextbox(textbox, ...)
@@ -1313,7 +1424,6 @@ do
 			end
 		}
 		
-		-- Fixed Lua shadowing bug: Renamed local callback helper to fireCallback to execute the original user callback parameter correctly
 		local function fireCallback(value)
 			if callback then
 				callback(value, function(...)
@@ -1418,7 +1528,7 @@ do
 		local button = colorpicker.Button
 		local toggle, debounce, animate
 		
-		lastColor = Color3.fromHSV(hue, sat, brightness)
+		local lastColor = Color3.fromHSV(hue, sat, brightness)
 		animate = function(visible, overwrite)
 			if overwrite then
 				if not toggle then
@@ -1485,7 +1595,7 @@ do
 		colorpicker.MouseButton1Click:Connect(toggleTab)
 		
 		tab.Container.Button.MouseButton1Click:Connect(function()
-			fireCallback(color3) -- Make Submit fire callback to update accent dynamically
+			fireCallback(color3)
 			animate()
 		end)
 		
@@ -1596,10 +1706,12 @@ do
 		
 		local value = default or min
 		local dragging, last
+		slider.Value = value
 		
-		local callback = function(value)
+		local callbackFunc = function(val)
+			slider.Value = val
 			if callback then
-				callback(value, function(...)
+				callback(val, function(...)
 					self:updateSlider(slider, ...)
 				end)
 			end
@@ -1618,7 +1730,7 @@ do
 				utility:Tween(circle, {ImageTransparency = 0}, 0.1)
 				
 				value = self:updateSlider(slider, nil, nil, min, max, value)
-				callback(value)
+				callbackFunc(value)
 				
 				utility:Wait()
 			end
@@ -1630,7 +1742,7 @@ do
 		textbox.FocusLost:Connect(function()
 			if not tonumber(textbox.Text) then
 				value = self:updateSlider(slider, nil, default or min, min, max)
-				callback(value)
+				callbackFunc(value)
 			end
 		end)
 		
@@ -1641,7 +1753,7 @@ do
 				textbox.Text = text:sub(1, #text - 1)
 			elseif not allowed[text] then	
 				value = self:updateSlider(slider, nil, tonumber(text) or value, min, max)
-				callback(value)
+				callbackFunc(value)
 			end
 		end)
 		
@@ -1736,6 +1848,7 @@ do
 		local focused
 		
 		list = list or {}
+		dropdown.Value = list[1] or ""
 		
 		search.Button.MouseButton1Click:Connect(function()
 			if search.Button.Rotation == 0 then
@@ -1771,6 +1884,34 @@ do
 		end)
 		
 		return dropdown
+	end
+	
+	function section:addLabel(title)
+		local label = utility:Create("Frame", {
+			Name = "Label",
+			Parent = self.container,
+			BackgroundTransparency = 1,
+			BorderSizePixel = 0,
+			Size = UDim2.new(1, 0, 0, IsMobile and 26 or 30),
+			ZIndex = 2
+		}, {
+			utility:Create("TextLabel", {
+				Name = "Title",
+				BackgroundTransparency = 1,
+				Size = UDim2.new(1, 0, 1, 0),
+				ZIndex = 3,
+				Font = Enum.Font.Gotham,
+				Text = title,
+				TextColor3 = themes.TextColor,
+				TextSize = 12,
+				TextTransparency = 0.3,
+				TextXAlignment = Enum.TextXAlignment.Left
+			})
+		})
+		
+		table.insert(self.modules, label)
+		self:Resize()
+		return label
 	end
 	
 	-- class functions
@@ -2032,6 +2173,7 @@ do
 		
 		percent = math.clamp(percent, 0, 1)
 		value = value or math.floor(min + (max - min) * percent)
+		slider.Value = value
 		
 		slider.TextBox.Text = value
 		utility:Tween(bar.Fill, {Size = UDim2.new(percent, 0, 1, 0)}, 0.1)
@@ -2048,6 +2190,7 @@ do
 		
 		if title then
 			dropdown.Search.TextBox.Text = title
+			dropdown.Value = title
 		end
 		
 		local entries = 0
@@ -2116,6 +2259,98 @@ do
 			frame.ScrollBarImageTransparency = 1
 		end
 	end
+	
+	function section:updateLabel(label, title)
+		label = self:getModule(label)
+		label.Title.Text = title
+	end
+end
+
+-- KairoUI compatibility layer
+library.CreateWindow = library.new
+
+function library:CreateTab(title, iconId)
+	local pageObj = self:addPage(title, iconId)
+	
+	function pageObj:CreateSubTab(subTitle)
+		return pageObj:addSection(subTitle)
+	end
+	
+	return pageObj
+end
+
+function library:CreateToggle(title, ParentCanvas, callback)
+	local toggle = ParentCanvas:addToggle(title, false, callback)
+	local toggleObj = {}
+	function toggleObj:Set(state)
+		toggle.Value = state
+		ParentCanvas:updateToggle(toggle, nil, state)
+		if callback then callback(state) end
+	end
+	function toggleObj:Get()
+		return toggle.Value
+	end
+	return toggleObj
+end
+
+function library:CreateButton(title, ParentCanvas, callback)
+	return ParentCanvas:addButton(title, callback)
+end
+
+function library:CreateSlider(title, ParentCanvas, min, max, default, callback)
+	local slider = ParentCanvas:addSlider(title, default, min, max, callback)
+	local sliderObj = {}
+	function sliderObj:Set(val)
+		slider.Value = val
+		ParentCanvas:updateSlider(slider, nil, val, min, max)
+		if callback then callback(val) end
+	end
+	function sliderObj:Get()
+		return slider.Value or default
+	end
+	return sliderObj
+end
+
+function library:CreateDropdown(title, ParentCanvas, options, callback)
+	local dropdown = ParentCanvas:addDropdown(title, options, callback)
+	local dropdownObj = {}
+	function dropdownObj:Set(value)
+		dropdown.Value = value
+		ParentCanvas:updateDropdown(dropdown, value, nil, callback)
+		if callback then callback(value) end
+	end
+	function dropdownObj:Get()
+		return dropdown.Value or (options and options[1] or "")
+	end
+	function dropdownObj:Refresh(newOptions, newCallback)
+		options = newOptions
+		if newCallback then callback = newCallback end
+		ParentCanvas:updateDropdown(dropdown, nil, newOptions, callback)
+	end
+	return dropdownObj
+end
+
+function library:CreateInput(title, ParentCanvas, placeholder, callback)
+	local textbox = ParentCanvas:addTextbox(title, placeholder, function(text, focusLost)
+		if focusLost then
+			textbox.Value = text
+			if callback then callback(text) end
+		end
+	end)
+	local inputObj = {}
+	function inputObj:Set(value)
+		textbox.Value = value
+		ParentCanvas:updateTextbox(textbox, nil, value)
+		if callback then callback(value) end
+	end
+	function inputObj:Get()
+		return textbox.Value or ""
+	end
+	return inputObj
+end
+
+function library:CreateLabel(title, ParentCanvas)
+	return ParentCanvas:addLabel(title)
 end
 
 return library
