@@ -11,14 +11,14 @@ local tweeninfo = TweenInfo.new
 -- additional
 local utility = {}
 
--- themes (Modified to make the main theme black, dark contrast deep black, and a default electric accent)
+-- themes (Darkened the contrast panels further to make the UI completely black and sleek)
 local objects = {}
 local themes = {
-	Background = Color3.fromRGB(10, 10, 10), 
+	Background = Color3.fromRGB(5, 5, 5), 
 	Glow = Color3.fromRGB(0, 0, 0), 
 	Accent = Color3.fromRGB(99, 102, 241), 
-	LightContrast = Color3.fromRGB(18, 18, 18), 
-	DarkContrast = Color3.fromRGB(12, 12, 12),  
+	LightContrast = Color3.fromRGB(12, 12, 12), 
+	DarkContrast = Color3.fromRGB(8, 8, 8),  
 	TextColor = Color3.fromRGB(255, 255, 255)
 }
 
@@ -263,7 +263,7 @@ do
 					Size = UDim2.new(1, 0, 0, 38),
 					ZIndex = 5,
 					Image = "rbxassetid://4595286933",
-					ImageColor3 = themes.Background, -- Set to background to align with the solid black theme
+					ImageColor3 = themes.Background, -- Solid black TopBar background
 					ScaleType = Enum.ScaleType.Slice,
 					SliceCenter = Rect.new(4, 4, 296, 296)
 				}, {
@@ -280,7 +280,7 @@ do
 						TextSize = 14,
 						TextXAlignment = Enum.TextXAlignment.Left
 					}),
-					utility:Create("Frame", { -- Accent color strip at bottom of top bar
+					utility:Create("Frame", { -- Accent strip
 						Name = "AccentStrip",
 						BackgroundColor3 = themes.Accent,
 						BorderSizePixel = 0,
@@ -747,7 +747,7 @@ do
 					Size = UDim2.new(1, -22, 1, -4),
 					ZIndex = 2,
 					Image = "rbxassetid://5028857472",
-					ImageColor3 = themes.Accent, -- Accent color used to indicate status/selection
+					ImageColor3 = themes.Accent, 
 					ScaleType = Enum.ScaleType.Slice,
 					SliceCenter = Rect.new(2, 2, 298, 298)
 				})
@@ -1133,7 +1133,7 @@ do
 						Size = UDim2.new(0, 2, 1, 0),
 						ZIndex = 2
 					}),
-					utility:Create("UIGradient", { -- rainbow canvas
+					utility:Create("UIGradient", {
 						Color = ColorSequence.new({
 							ColorSequenceKeypoint.new(0.00, Color3.fromRGB(255, 0, 0)), 
 							ColorSequenceKeypoint.new(0.17, Color3.fromRGB(255, 255, 0)), 
@@ -1313,7 +1313,8 @@ do
 			end
 		}
 		
-		local callback = function(value)
+		-- Fixed Lua shadowing bug: Renamed local callback helper to fireCallback to execute the original user callback parameter correctly
+		local function fireCallback(value)
 			if callback then
 				callback(value, function(...)
 					self:updateColorPicker(colorpicker, ...)
@@ -1365,7 +1366,7 @@ do
 						hue, sat, brightness = Color3.toHSV(color3)
 						
 						self:updateColorPicker(colorpicker, nil, color3)
-						callback(color3)
+						fireCallback(color3)
 					end
 				end)
 			end
@@ -1389,7 +1390,7 @@ do
 				self:updateColorPicker(colorpicker, nil, {hue, sat, brightness})
 				utility:Tween(canvas.Cursor, {Position = UDim2.new(sat, 0, 1 - brightness, 0)}, 0.1)
 				
-				callback(color3)
+				fireCallback(color3)
 				utility:Wait()
 			end
 		end)
@@ -1409,7 +1410,7 @@ do
 				self:updateColorPicker(colorpicker, nil, {hue, sat, brightness})
 				utility:Tween(tab.Container.Color.Select, {Position = UDim2.new(x, 0, 0, 0)}, 0.1)
 				
-				callback(color3)
+				fireCallback(color3)
 				utility:Wait()
 			end
 		end)
@@ -1484,11 +1485,13 @@ do
 		colorpicker.MouseButton1Click:Connect(toggleTab)
 		
 		tab.Container.Button.MouseButton1Click:Connect(function()
+			fireCallback(color3) -- Make Submit fire callback to update accent dynamically
 			animate()
 		end)
 		
 		tab.Close.MouseButton1Click:Connect(function()
 			self:updateColorPicker(colorpicker, nil, lastColor)
+			fireCallback(lastColor)
 			animate()
 		end)
 		
@@ -1561,7 +1564,7 @@ do
 						Size = UDim2.new(0.8, 0, 1, 0),
 						ZIndex = 3,
 						Image = "rbxassetid://5028857472",
-						ImageColor3 = themes.Accent, -- Slider fill uses the Accent theme color now
+						ImageColor3 = themes.Accent, 
 						ScaleType = Enum.ScaleType.Slice,
 						SliceCenter = Rect.new(2, 2, 298, 298)
 					}, {
@@ -1691,7 +1694,7 @@ do
 					Size = UDim2.new(0, 18, 0, 18),
 					ZIndex = 3,
 					Image = "rbxassetid://5012539403",
-					ImageColor3 = themes.Accent, -- Changed dropdown open arrow button to use Accent theme color
+					ImageColor3 = themes.Accent, 
 					SliceCenter = Rect.new(2, 2, 298, 298)
 				})
 			}),
@@ -1779,7 +1782,6 @@ do
 		local button = page.button
 		
 		if toggle then
-			-- page button - uses dynamic themes.Accent color
 			button.Title.TextColor3 = themes.Accent
 			button.Title.TextTransparency = 0
 			button.Title.Font = Enum.Font.GothamSemibold
