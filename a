@@ -19,8 +19,32 @@ local Library do
     end
 
     local LocalPlayer = Players.LocalPlayer
+    if not LocalPlayer then
+        pcall(function()
+            Players:GetPropertyChangedSignal("LocalPlayer"):Wait()
+        end)
+        LocalPlayer = Players.LocalPlayer
+    end
     local Camera = Workspace.CurrentCamera
-    local Mouse = LocalPlayer:GetMouse()
+    local Mouse = LocalPlayer and LocalPlayer:GetMouse()
+
+    local function checkIfMobile()
+        if not LocalPlayer then return false end
+        local pgui = LocalPlayer:FindFirstChildOfClass("PlayerGui")
+        if pgui and pgui:FindFirstChild("TouchGui") then
+            return true
+        end
+        if UserInputService.TouchEnabled then
+            return true
+        end
+        if not UserInputService.KeyboardEnabled then
+            return true
+        end
+        if UserInputService.AccelerometerEnabled or UserInputService.GyroscopeEnabled then
+            return true
+        end
+        return false
+    end
 
     local FromRGB = Color3.fromRGB
     local FromHSV = Color3.fromHSV
@@ -1958,7 +1982,7 @@ local Library do
             }
 
             local Items = { } do
-                local isMobile = UserInputService.TouchEnabled or not UserInputService.KeyboardEnabled or UserInputService.AccelerometerEnabled or UserInputService.GyroscopeEnabled or (LocalPlayer:FindFirstChildOfClass("PlayerGui") and LocalPlayer:FindFirstChildOfClass("PlayerGui"):FindFirstChild("TouchGui") ~= nil)
+                local isMobile = checkIfMobile()
                 local frameSize = isMobile and UDim2New(0, 520, 0, 380) or UDim2New(0, 673, 0, 511)
                 local minResize = isMobile and Vector2New(520, 380) or Vector2New(673, 511)
 
@@ -2200,7 +2224,7 @@ end)
                     BorderSizePixel = 0
                 })                
                 
-                local isMobile = UserInputService.TouchEnabled or not UserInputService.KeyboardEnabled or UserInputService.AccelerometerEnabled or UserInputService.GyroscopeEnabled or (LocalPlayer:FindFirstChildOfClass("PlayerGui") and LocalPlayer:FindFirstChildOfClass("PlayerGui"):FindFirstChild("TouchGui") ~= nil)
+                local isMobile = checkIfMobile()
 
                 local MinimizeButton = Instances:Create("TextButton", {
                     Parent = Items["MainFrame"].Instance,
