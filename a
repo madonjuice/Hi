@@ -2935,9 +2935,25 @@ end)
             end
             setInitialState(Toggle.Default)
 
-            Items["Toggle"]:Connect("MouseButton1Click", function()
-                Toggle:Set(not Toggle.Value)
-            end)
+            do
+                local touchStartPos = nil
+                Items["Toggle"]:Connect("InputBegan", function(Input)
+                    if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
+                        touchStartPos = Input.Position
+                    end
+                end)
+                Items["Toggle"]:Connect("InputEnded", function(Input)
+                    if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
+                        if touchStartPos then
+                            local delta = (Input.Position - touchStartPos).Magnitude
+                            if delta < 10 then
+                                Toggle:Set(not Toggle.Value)
+                            end
+                        end
+                        touchStartPos = nil
+                    end
+                end)
+            end
 
             Library.SetFlags[Toggle.Flag] = function(Value)
                 Toggle:Set(Value)
@@ -3030,9 +3046,25 @@ end)
                 Items["Stroke"]:Tween(nil, {Color = Library.Theme.Outline})
             end
 
-            Items["Button"]:Connect("MouseButton1Click", function()
-                Button:Press()
-            end)
+            do
+                local touchStartPos = nil
+                Items["Button"]:Connect("InputBegan", function(Input)
+                    if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
+                        touchStartPos = Input.Position
+                    end
+                end)
+                Items["Button"]:Connect("InputEnded", function(Input)
+                    if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
+                        if touchStartPos then
+                            local delta = (Input.Position - touchStartPos).Magnitude
+                            if delta < 10 then
+                                Button:Press()
+                            end
+                        end
+                        touchStartPos = nil
+                    end
+                end)
+            end
 
             return Button
         end
