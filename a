@@ -1,5 +1,4 @@
 
-
 if getgenv().Library then
     getgenv().Library:Unload()
 end
@@ -1958,7 +1957,7 @@ local Library do
             }
 
             local Items = { } do
-                local isMobile = UserInputService.TouchEnabled
+                local isMobile = UserInputService.TouchEnabled or not UserInputService.KeyboardEnabled
                 local frameSize = isMobile and UDim2New(0, 520, 0, 380) or UDim2New(0, 673, 0, 511)
                 local minResize = isMobile and Vector2New(520, 380) or Vector2New(673, 511)
 
@@ -2200,7 +2199,7 @@ end)
                     BorderSizePixel = 0
                 })                
                 
-                local isMobile = UserInputService.TouchEnabled
+                local isMobile = UserInputService.TouchEnabled or not UserInputService.KeyboardEnabled
 
                 local MinimizeButton = Instances:Create("TextButton", {
                     Parent = Items["MainFrame"].Instance,
@@ -2233,12 +2232,12 @@ end)
                     Name = "MobileReopenButton",
                     Size = UDim2.fromOffset(50, 50),
                     Position = UDim2.new(0, 15, 0, 15),
-                    BackgroundColor3 = FromRGB(18, 20, 26),
-                    BackgroundTransparency = 0.2,
+                    BackgroundColor3 = FromRGB(0, 0, 0),
+                    BackgroundTransparency = 0.1,
                     AutoButtonColor = true,
                     Visible = false,
                     ZIndex = 999998
-                }):AddToTheme({BackgroundColor3 = 'Element'})
+                })
 
                 Instances:Create("UICorner", {
                     Parent = MobileButton.Instance,
@@ -2247,9 +2246,9 @@ end)
 
                 Instances:Create("UIStroke", {
                     Parent = MobileButton.Instance,
-                    Color = Library.Theme.Accent or FromRGB(236, 245, 253),
-                    Thickness = 2
-                }):AddToTheme({Color = 'Accent'})
+                    Color = FromRGB(40, 40, 45),
+                    Thickness = 1.5
+                })
 
                 local MobileButtonImage = Instances:Create("ImageLabel", {
                     Parent = MobileButton.Instance,
@@ -2303,6 +2302,10 @@ end)
                     if isMobile and Items["MobileReopenButton"] then
                         Items["MobileReopenButton"].Instance.Visible = false
                     end
+                else
+                    if isMobile and Items["MobileReopenButton"] then
+                        Items["MobileReopenButton"].Instance.Visible = true
+                    end
                 end
 
                 local Descendants = Items["MainFrame"].Instance:GetDescendants()
@@ -2329,9 +2332,7 @@ end)
                 NewTween.Tween.Completed:Connect(function()
                     Debounce = false 
                     Items["MainFrame"].Instance.Visible = Window.IsOpen
-                    if isMobile and Items["MobileReopenButton"] then
-                        Items["MobileReopenButton"].Instance.Visible = not Window.IsOpen
-                    elseif not isMobile and not Window.IsOpen then
+                    if not isMobile and not Window.IsOpen then
                         local keyName = "Right Shift"
                         if Library.MenuKeybind then
                             local cleanKey = tostring(Library.MenuKeybind):match("([^.]+)$")
