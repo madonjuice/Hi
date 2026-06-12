@@ -128,13 +128,93 @@ local Library do
 
         Font = nil,
 
-        _IsScrolling = false,
-        _LastScrollTick = 0
+        _TapRegistry = {},
+        _LastTouchMoveTick = 0
     }
 
     Library.__index = Library
     Library.Sections.__index = Library.Sections
     Library.Pages.__index = Library.Pages
+
+    -- Global tap detection system: tracks ALL touch/mouse input at the engine level.
+    -- Elements register themselves via Library:RegisterTap(instance, callback).
+    -- When a genuine tap is detected (finger moved <12px and lasted <0.4s),
+    -- we check which registered element is under the finger and fire its callback.
+    -- This completely bypasses ScrollingFrame input conflicts.
+    do
+        local tapStartPos = nil
+        local tapStartTime = 0
+
+        -- Track any touch/mouse movement globally to know if user is scrolling
+        UserInputService.InputChanged:Connect(function(Input)
+            if Input.UserInputType == Enum.UserInputType.Touch or Input.UserInputType == Enum.UserInputType.MouseMovement then
+                Library._LastTouchMoveTick = tick()
+            end
+        end)
+
+        UserInputService.InputBegan:Connect(function(Input)
+            if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
+                tapStartPos = Vector2New(Input.Position.X, Input.Position.Y)
+                tapStartTime = tick()
+            end
+        end)
+
+        UserInputService.InputEnded:Connect(function(Input)
+            if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
+                if tapStartPos then
+                    local endPos = Vector2New(Input.Position.X, Input.Position.Y)
+                    local delta = (endPos - tapStartPos).Magnitude
+                    local elapsed = tick() - tapStartTime
+
+                    if delta < 12 and elapsed < 0.4 then
+                        -- Genuine tap detected - find which registered element is under the finger
+                        local tapX, tapY = endPos.X, endPos.Y
+                        for entry, _ in pairs(Library._TapRegistry) do
+                            local inst = entry.Instance
+                            if inst and inst.Parent and inst.Visible ~= false then
+                                local pos = inst.AbsolutePosition
+                                local size = inst.AbsoluteSize
+                                if tapX >= pos.X and tapX <= pos.X + size.X and tapY >= pos.Y and tapY <= pos.Y + size.Y then
+                                    -- Check the element is not clipped (inside visible scroll area)
+                                    local pass = true
+                                    local parent = inst.Parent
+                                    while parent and parent:IsA("GuiObject") do
+                                        if parent:IsA("ScrollingFrame") then
+                                            local pPos = parent.AbsolutePosition
+                                            local pSize = parent.AbsoluteSize
+                                            if tapY < pPos.Y or tapY > pPos.Y + pSize.Y or tapX < pPos.X or tapX > pPos.X + pSize.X then
+                                                pass = false
+                                                break
+                                            end
+                                        end
+                                        parent = parent.Parent
+                                    end
+                                    if pass then
+                                        task.spawn(entry.Callback)
+                                        break
+                                    end
+                                end
+                            end
+                        end
+                    end
+                end
+                tapStartPos = nil
+            end
+        end)
+    end
+
+    function Library:RegisterTap(wrappedInstance, callback)
+        Library._TapRegistry[{Instance = wrappedInstance.Instance, Callback = callback}] = true
+    end
+
+    function Library:UnregisterTap(wrappedInstance)
+        for entry, _ in pairs(Library._TapRegistry) do
+            if entry.Instance == wrappedInstance.Instance then
+                Library._TapRegistry[entry] = nil
+                break
+            end
+        end
+    end
 
     function Library:Notification(Data)
         Data = Data or {}
@@ -1987,8 +2067,8 @@ local Library do
 
             local Items = { } do
                 local isMobile = checkIfMobile()
-                local frameSize = isMobile and UDim2New(0, 520, 0, 380) or UDim2New(0, 673, 0, 511)
-                local minResize = isMobile and Vector2New(520, 380) or Vector2New(673, 511)
+                local frameSize = isMobile and UDim2New(0, 620, 0, 400) or UDim2New(0, 673, 0, 511)
+                local minResize = isMobile and Vector2New(620, 400) or Vector2New(673, 511)
 
                 Items["MainFrame"] = Instances:Create("Frame", {
                     Parent = Library.Holder.Instance,
@@ -2502,24 +2582,6 @@ end)
                     SortOrder = Enum.SortOrder.LayoutOrder
                 })           
                 
-                -- Track scrolling state so toggles/buttons don't fire during a scroll
-                do
-                    local lastCanvasPos = Items["Column"].Instance.CanvasPosition
-                    Items["Column"].Instance:GetPropertyChangedSignal("CanvasPosition"):Connect(function()
-                        local newPos = Items["Column"].Instance.CanvasPosition
-                        if newPos ~= lastCanvasPos then
-                            Library._IsScrolling = true
-                            Library._LastScrollTick = tick()
-                            lastCanvasPos = newPos
-                            task.delay(0.25, function()
-                                if tick() - Library._LastScrollTick >= 0.2 then
-                                    Library._IsScrolling = false
-                                end
-                            end)
-                        end
-                    end)
-                end
-                
                 Page.Items = Items
             end
 
@@ -2743,19 +2805,13 @@ end)
             }
 
             local Items = { } do 
-                Items["Toggle"] = Instances:Create("TextButton", {
+                Items["Toggle"] = Instances:Create("Frame", {
                     Parent = Toggle.Section.Items["Content"].Instance,
                     Name = "\0",
-                    FontFace = Library.Font,
-                    TextColor3 = FromRGB(0, 0, 0),
                     BorderColor3 = FromRGB(0, 0, 0),
-                    Text = "",
-                    AutoButtonColor = false,
-                    Active = false,
                     BackgroundTransparency = 1,
                     Size = UDim2New(1, 0, 0, 20),
-                    BorderSizePixel = 0,
-                    TextSize = 14
+                    BorderSizePixel = 0
                 })
                 
                 Items["Text"] = Instances:Create("TextLabel", {
@@ -2957,28 +3013,9 @@ end)
             end
             setInitialState(Toggle.Default)
 
-            do
-                local touchStartPos = nil
-                local touchStartTime = 0
-                Items["Toggle"]:Connect("InputBegan", function(Input)
-                    if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
-                        touchStartPos = Input.Position
-                        touchStartTime = tick()
-                    end
-                end)
-                Items["Toggle"]:Connect("InputEnded", function(Input)
-                    if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
-                        if touchStartPos and not Library._IsScrolling then
-                            local delta = (Input.Position - touchStartPos).Magnitude
-                            local elapsed = tick() - touchStartTime
-                            if delta < 10 and elapsed < 0.3 then
-                                Toggle:Set(not Toggle.Value)
-                            end
-                        end
-                        touchStartPos = nil
-                    end
-                end)
-            end
+            Library:RegisterTap(Items["Toggle"], function()
+                Toggle:Set(not Toggle.Value)
+            end)
 
             Library.SetFlags[Toggle.Flag] = function(Value)
                 Toggle:Set(Value)
@@ -3000,16 +3037,11 @@ end)
             }
 
             local Items = { } do 
-                Items["Button"] = Instances:Create("TextButton", {
+                Items["Button"] = Instances:Create("Frame", {
                     Parent = Button.Section.Items["Content"].Instance,
                     Name = "\0",
-                    TextColor3 = Library.Theme["Text"],
                     BorderColor3 = FromRGB(0, 0, 0),
-                    Text = "",
-                    AutoButtonColor = false,
                     Size = UDim2New(1, 0, 0, 30),
-                    Selectable = false,
-                    Active = false,
                     BorderSizePixel = 0,
                     BackgroundColor3 = Library.Theme["Element"]
                 }):AddToTheme({BackgroundColor3 = 'Element'})
@@ -3071,28 +3103,9 @@ end)
                 Items["Stroke"]:Tween(nil, {Color = Library.Theme.Outline})
             end
 
-            do
-                local touchStartPos = nil
-                local touchStartTime = 0
-                Items["Button"]:Connect("InputBegan", function(Input)
-                    if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
-                        touchStartPos = Input.Position
-                        touchStartTime = tick()
-                    end
-                end)
-                Items["Button"]:Connect("InputEnded", function(Input)
-                    if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
-                        if touchStartPos and not Library._IsScrolling then
-                            local delta = (Input.Position - touchStartPos).Magnitude
-                            local elapsed = tick() - touchStartTime
-                            if delta < 10 and elapsed < 0.3 then
-                                Button:Press()
-                            end
-                        end
-                        touchStartPos = nil
-                    end
-                end)
-            end
+            Library:RegisterTap(Items["Button"], function()
+                Button:Press()
+            end)
 
             return Button
         end
@@ -3278,7 +3291,7 @@ end)
             
             Items["RealSlider"]:Connect("InputBegan", function(Input)
                 if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
-                    if Library._IsScrolling then return end
+                    if (tick() - Library._LastTouchMoveTick) < 0.15 then return end
                     Slider.Sliding = true
 
                     local SizeX = (Input.Position.X - Items["RealSlider"].Instance.AbsolutePosition.X) / Items["RealSlider"].Instance.AbsoluteSize.X
@@ -3769,28 +3782,9 @@ end)
                 end
             end
 
-            do
-                local touchStartPos = nil
-                local touchStartTime = 0
-                Items["RealDropdown"]:Connect("InputBegan", function(Input)
-                    if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
-                        touchStartPos = Input.Position
-                        touchStartTime = tick()
-                    end
-                end)
-                Items["RealDropdown"]:Connect("InputEnded", function(Input)
-                    if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
-                        if touchStartPos and not Library._IsScrolling then
-                            local delta = (Input.Position - touchStartPos).Magnitude
-                            local elapsed = tick() - touchStartTime
-                            if delta < 10 and elapsed < 0.3 then
-                                Dropdown:SetOpen(not Dropdown.IsOpen)
-                            end
-                        end
-                        touchStartPos = nil
-                    end
-                end)
-            end
+            Library:RegisterTap(Items["RealDropdown"], function()
+                Dropdown:SetOpen(not Dropdown.IsOpen)
+            end)
 
             Library:Connect(UserInputService.InputBegan, function(Input)
                 if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
