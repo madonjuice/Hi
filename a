@@ -915,11 +915,11 @@ local Library do
                 Name = "\0",
                 ImageColor3 = FromRGB(148, 255, 237),
                 ScaleType = Enum.ScaleType.Slice,
-                ImageTransparency = 0.800000011920929,
+                ImageTransparency = 1,
                 BorderColor3 = FromRGB(0, 0, 0),
-                Size = UDim2New(1, 25, 1, 25),
+                Size = UDim2New(0, 0, 0, 0),
                 AnchorPoint = Vector2New(0.5, 0.5),
-                Image = "http://www.roblox.com/asset/?id=18245826428",
+                Image = "",
                 BackgroundTransparency = 1,
                 Position = UDim2New(0.5, 0, 0.5, 0),
                 ZIndex = 2,
@@ -2060,6 +2060,62 @@ end)
                     BorderSizePixel = 0
                 })                
                 
+                local isMobile = UserInputService.TouchEnabled
+
+                local MinimizeButton = Instances:Create("TextButton", {
+                    Parent = Items["MainFrame"].Instance,
+                    Name = "MinimizeButton",
+                    Size = UDim2.fromOffset(24, 24),
+                    Position = UDim2.new(1, -60, 0, 10),
+                    BackgroundTransparency = 1,
+                    FontFace = Library.Font,
+                    Text = "-",
+                    TextSize = 22,
+                    TextColor3 = Library.Theme.Text,
+                    ZIndex = 999999
+                }):AddToTheme({TextColor3 = 'Text'})
+
+                local CloseButton = Instances:Create("TextButton", {
+                    Parent = Items["MainFrame"].Instance,
+                    Name = "CloseButton",
+                    Size = UDim2.fromOffset(24, 24),
+                    Position = UDim2.new(1, -30, 0, 10),
+                    BackgroundTransparency = 1,
+                    FontFace = Library.Font,
+                    Text = "x",
+                    TextSize = 20,
+                    TextColor3 = Library.Theme.Text,
+                    ZIndex = 999999
+                }):AddToTheme({TextColor3 = 'Text'})
+
+                local MobileButton = Instances:Create("ImageButton", {
+                    Parent = Library.Holder.Instance,
+                    Name = "MobileReopenButton",
+                    Size = UDim2.fromOffset(45, 45),
+                    Position = UDim2.new(0, 10, 0, 10),
+                    BackgroundTransparency = 1,
+                    Image = "rbxassetid://116486413960174",
+                    Visible = false,
+                    ZIndex = 999999
+                })
+                local corner = Instance.new("UICorner")
+                corner.CornerRadius = UDim.new(1, 0)
+                corner.Parent = MobileButton.Instance
+
+                Items["MobileReopenButton"] = MobileButton
+
+                MinimizeButton:Connect("MouseButton1Click", function()
+                    Window:SetOpen(false)
+                end)
+
+                CloseButton:Connect("MouseButton1Click", function()
+                    Library:Unload()
+                end)
+
+                MobileButton:Connect("MouseButton1Click", function()
+                    Window:SetOpen(true)
+                end)
+                
                 Window.Items = Items
             end
             
@@ -2084,6 +2140,9 @@ end)
 
                 if Window.IsOpen then 
                     Items["MainFrame"].Instance.Visible = true 
+                    if isMobile and Items["MobileReopenButton"] then
+                        Items["MobileReopenButton"].Instance.Visible = false
+                    end
                 end
 
                 local Descendants = Items["MainFrame"].Instance:GetDescendants()
@@ -2110,6 +2169,9 @@ end)
                 NewTween.Tween.Completed:Connect(function()
                     Debounce = false 
                     Items["MainFrame"].Instance.Visible = Window.IsOpen
+                    if isMobile and Items["MobileReopenButton"] then
+                        Items["MobileReopenButton"].Instance.Visible = not Window.IsOpen
+                    end
                 end)
             end
 
@@ -2553,9 +2615,9 @@ end)
                     ScaleType = Enum.ScaleType.Slice,
                     ImageTransparency = 1,
                     BorderColor3 = FromRGB(0, 0, 0),
-                    Size = UDim2New(1, 25, 1, 25),
+                    Size = UDim2New(0, 0, 0, 0),
                     AnchorPoint = Vector2New(0.5, 0.5),
-                    Image = "http://www.roblox.com/asset/?id=18245826428",
+                    Image = "",
                     BackgroundTransparency = 1,
                     Position = UDim2New(0.5, 0, 0.5, 0),
                     BorderSizePixel = 0,
@@ -2572,7 +2634,7 @@ end)
                 Library.Flags[Toggle.Flag] = Value 
 
                 if Toggle.Value then 
-                    Items["Glow"]:Tween(nil, {ImageTransparency = 0.7})
+                    Items["Glow"]:Tween(nil, {ImageTransparency = 1})
                     
                     Items["Circle"]:ChangeItemTheme({BackgroundColor3 = "Accent"})
                     Items["Circle"]:Tween(nil, {
@@ -2586,12 +2648,12 @@ end)
                 else
                     Items["Glow"]:Tween(nil, {ImageTransparency = 1})
                     
-                    Items["Circle"]:ChangeItemTheme({BackgroundColor3 = function() return FromRGB(255, 255, 255) end})
+                    Items["Circle"]:ChangeItemTheme({BackgroundColor3 = "Element"})
                     Items["Circle"]:Tween(nil, {
                         AnchorPoint = Vector2New(0, 0.5),
                         Position = UDim2New(0, 3, 0.5, 0),
-                        BackgroundTransparency = 0.6,
-                        BackgroundColor3 = FromRGB(255, 255, 255)
+                        BackgroundTransparency = 0,
+                        BackgroundColor3 = Library.Theme.Element
                     })
 
                     Items["Text"]:Tween(nil, {TextTransparency = 0.5})
@@ -2859,11 +2921,11 @@ end)
                     Name = "\0",
                     ImageColor3 = Library.Theme["Accent"],
                     ScaleType = Enum.ScaleType.Slice,
-                    ImageTransparency = 0.800000011920929,
+                    ImageTransparency = 1,
                     BorderColor3 = FromRGB(0, 0, 0),
-                    Size = UDim2New(1, 25, 1, 25),
+                    Size = UDim2New(0, 0, 0, 0),
                     AnchorPoint = Vector2New(0.5, 0.5),
-                    Image = "http://www.roblox.com/asset/?id=18245826428",
+                    Image = "",
                     BackgroundTransparency = 1,
                     Position = UDim2New(0.5, 0, 0.5, 0),
                     ZIndex = 2,
@@ -2892,18 +2954,17 @@ end)
                     Name = "\0",
                     ImageColor3 = Library.Theme["Accent"],
                     ScaleType = Enum.ScaleType.Slice,
-                    ImageTransparency = 0.800000011920929,
+                    ImageTransparency = 1,
                     BorderColor3 = FromRGB(0, 0, 0),
-                    Size = UDim2New(1, 25, 1, 25),
+                    Size = UDim2New(0, 0, 0, 0),
                     AnchorPoint = Vector2New(0.5, 0.5),
-                    Image = "http://www.roblox.com/asset/?id=18245826428",
+                    Image = "",
                     BackgroundTransparency = 1,
                     Position = UDim2New(0.5, 0, 0.5, 0),
                     ZIndex = 2,
                     BorderSizePixel = 0,
                     SliceCenter = RectNew(Vector2New(21, 21), Vector2New(79, 79))
-                }):AddToTheme({ImageColor3 = 'Accent'})
-                
+                }):AddToTheme({ImageColor3 = 'Accent'})                
                 Items["Value"] = Instances:Create("TextLabel", {
                     Parent = Items["Slider"].Instance,
                     Name = "\0",
@@ -3307,9 +3368,9 @@ end)
                     ScaleType = Enum.ScaleType.Slice,
                     ImageTransparency = 1,
                     BorderColor3 = FromRGB(0, 0, 0),
-                    Size = UDim2New(1, 25, 1, 25),
+                    Size = UDim2New(0, 0, 0, 0),
                     AnchorPoint = Vector2New(0.5, 0.5),
-                    Image = "http://www.roblox.com/asset/?id=18245826428",
+                    Image = "",
                     BackgroundTransparency = 1,
                     Position = UDim2New(0.5, 0, 0.5, 0),
                     BorderSizePixel = 0,
@@ -3351,7 +3412,7 @@ end)
                 function OptionData:Toggle(Value)
                     if Value == "Active" then
                         OptionData.Liner:Tween(nil, {BackgroundTransparency = 0, Size = UDim2New(0, 3, 1, 0)})
-                        OptionData.Glow:Tween(nil, {ImageTransparency = 0.7})
+                        OptionData.Glow:Tween(nil, {ImageTransparency = 1})
                         OptionData.Text:Tween(nil, {Position = UDim2New(0, 12, 0.5 ,0), TextTransparency = 0})
                     else
                         OptionData.Liner:Tween(nil, {BackgroundTransparency = 1, Size = UDim2New(0, 3, 0, 0)})
