@@ -1,4 +1,5 @@
-
+-- Made by samet
+-- Reposted by @da7mu on Discord
 
 if getgenv().Library then
     getgenv().Library:Unload()
@@ -796,23 +797,19 @@ local Library do
         local List = { }
         local ReturnList = { }
 
-        List = listfiles(Library.Folders.Configs)
-
-        for Index = 1, #List do 
-            local File = List[Index]
-
-            if File:sub(-5) == ".json" then
-                local Position = File:find(".json", 1, true)
-                local StartPosition = Position
-
-                local Character = File:sub(Position, Position)
-                while Character ~= "/" and Character ~= "\\" and Character ~= "" do
-                    Position = Position - 1
-                    Character = File:sub(Position, Position)
-                end
-
-                if Character == "/" or Character == "\\" then
-                    TableInsert(ReturnList, File:sub(Position + 1, StartPosition - 1))
+        local successList, files = pcall(function() return listfiles(Library.Folders.Configs) end)
+        if successList and files then
+            for Index = 1, #files do 
+                local File = files[Index]
+                if File:sub(-5) == ".json" then
+                    -- Extract basename cleanly
+                    local name = File:match("([^/^\\]+)%.json$") or File:match("([^/\\]+)%.json$") or File
+                    if name then
+                        if name:sub(-5) == ".json" then
+                            name = name:sub(1, #name - 5)
+                        end
+                        TableInsert(ReturnList, name)
+                    end
                 end
             end
         end
@@ -1966,15 +1963,15 @@ end)
                     BorderSizePixel = 0
                 })
                 
-                Items["Logo"] = Instances:Create("ImageLabel", {
+                 Items["Logo"] = Instances:Create("ImageLabel", {
                     Parent = Items["Top"].Instance,
                     Name = "\0",
                     ScaleType = Enum.ScaleType.Fit,
                     BorderColor3 = FromRGB(0, 0, 0),
                     Image = Window.Logo,
                     BackgroundTransparency = 1,
-                    Position = UDim2New(0, 20, 0, 20),
-                    Size = UDim2New(0, 30, 0, 30),
+                    Position = UDim2New(0, 15, 0, 15),
+                    Size = UDim2New(0, 40, 0, 40),
                     BorderSizePixel = 0
                 })
                 
@@ -1988,7 +1985,7 @@ end)
                     Size = UDim2New(0, 0, 0, 14),
                     BorderSizePixel = 0,
                     BackgroundTransparency = 1,
-                    Position = UDim2New(0, 60, 0, 15),
+                    Position = UDim2New(0, 70, 0, 15),
                     TextWrapped = true,
                     AutomaticSize = Enum.AutomaticSize.X,
                     TextSize = 18
@@ -2005,7 +2002,7 @@ end)
                     BorderColor3 = FromRGB(0, 0, 0),
                     BorderSizePixel = 0,
                     BackgroundTransparency = 1,
-                    Position = UDim2New(0, 60, 0, 36),
+                    Position = UDim2New(0, 70, 0, 36),
                     TextWrapped = true,
                     AutomaticSize = Enum.AutomaticSize.X,
                     TextSize = 16
@@ -2476,7 +2473,7 @@ end)
                     BorderSizePixel = 0
                 })
                 
-                Items["Text"] = Instances:Create("TextLabel", {
+                 Items["Text"] = Instances:Create("TextLabel", {
                     Parent = Items["Top"].Instance,
                     Name = "\0",
                     FontFace = Library.Font,
@@ -2488,7 +2485,7 @@ end)
                     AnchorPoint = Vector2New(0, 0.5),
                     BorderSizePixel = 0,
                     BackgroundTransparency = 1,
-                    Position = UDim2New(0, 40, 0.5, -2),
+                    Position = UDim2New(0, 45, 0.5, -2),
                     AutomaticSize = Enum.AutomaticSize.X,
                     TextSize = 16
                 }):AddToTheme({TextColor3 = 'Text'})
@@ -2513,7 +2510,7 @@ end)
                     Image = Section.Icon,
                     BackgroundTransparency = 1,
                     Position = UDim2New(0, 10, 0.5, 0),
-                    Size = UDim2New(0, 18, 0, 18),
+                    Size = UDim2New(0, 24, 0, 24),
                     BorderSizePixel = 0
                 }):AddToTheme({ImageColor3 = 'Text'})
                 
@@ -2753,11 +2750,37 @@ end)
                 return NewKeybind
             end
 
+            -- Set default state visually without triggering callback
+            local function setInitialState(state)
+                Toggle.Value = state
+                Library.Flags[Toggle.Flag] = state
+                if state then 
+                    Items["Glow"]:Tween(nil, {ImageTransparency = 1})
+                    Items["Circle"]:ChangeItemTheme({BackgroundColor3 = "Accent"})
+                    Items["Circle"]:Tween(nil, {
+                        AnchorPoint = Vector2New(1, 0.5),
+                        Position = UDim2New(1, -3, 0.5, 0),
+                        BackgroundTransparency = 0,
+                        BackgroundColor3 = Library.Theme.Accent
+                    })
+                    Items["Text"]:Tween(nil, {TextTransparency = 0})
+                else
+                    Items["Glow"]:Tween(nil, {ImageTransparency = 1})
+                    Items["Circle"]:ChangeItemTheme({BackgroundColor3 = "Element"})
+                    Items["Circle"]:Tween(nil, {
+                        AnchorPoint = Vector2New(0, 0.5),
+                        Position = UDim2New(0, 3, 0.5, 0),
+                        BackgroundTransparency = 0,
+                        BackgroundColor3 = Library.Theme.Element
+                    })
+                    Items["Text"]:Tween(nil, {TextTransparency = 0.5})
+                end
+            end
+            setInitialState(Toggle.Default)
+
             Items["Toggle"]:Connect("MouseButton1Down", function()
                 Toggle:Set(not Toggle.Value)
             end)
-
-            Toggle:Set(Toggle.Default)
 
             Library.SetFlags[Toggle.Flag] = function(Value)
                 Toggle:Set(Value)
