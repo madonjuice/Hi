@@ -1,5 +1,4 @@
--- Made by samet
--- Reposted by @da7mu on Discord
+
 
 if getgenv().Library then
     getgenv().Library:Unload()
@@ -1959,7 +1958,7 @@ local Library do
             }
 
             local Items = { } do
-                local isMobile = UserInputService.TouchEnabled or not UserInputService.KeyboardEnabled
+                local isMobile = UserInputService.TouchEnabled or not UserInputService.KeyboardEnabled or UserInputService.AccelerometerEnabled or UserInputService.GyroscopeEnabled or (LocalPlayer:FindFirstChildOfClass("PlayerGui") and LocalPlayer:FindFirstChildOfClass("PlayerGui"):FindFirstChild("TouchGui") ~= nil)
                 local frameSize = isMobile and UDim2New(0, 520, 0, 380) or UDim2New(0, 673, 0, 511)
                 local minResize = isMobile and Vector2New(520, 380) or Vector2New(673, 511)
 
@@ -2201,7 +2200,7 @@ end)
                     BorderSizePixel = 0
                 })                
                 
-                local isMobile = UserInputService.TouchEnabled or not UserInputService.KeyboardEnabled
+                local isMobile = UserInputService.TouchEnabled or not UserInputService.KeyboardEnabled or UserInputService.AccelerometerEnabled or UserInputService.GyroscopeEnabled or (LocalPlayer:FindFirstChildOfClass("PlayerGui") and LocalPlayer:FindFirstChildOfClass("PlayerGui"):FindFirstChild("TouchGui") ~= nil)
 
                 local MinimizeButton = Instances:Create("TextButton", {
                     Parent = Items["MainFrame"].Instance,
