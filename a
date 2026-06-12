@@ -1,4 +1,5 @@
-
+-- Made by samet
+-- Reposted by @da7mu on Discord
 
 if getgenv().Library then
     getgenv().Library:Unload()
@@ -125,7 +126,10 @@ local Library do
         NotifHolder = nil,
         UnusedHolder = nil,
 
-        Font = nil
+        Font = nil,
+
+        _IsScrolling = false,
+        _LastScrollTick = 0
     }
 
     Library.__index = Library
@@ -2498,6 +2502,24 @@ end)
                     SortOrder = Enum.SortOrder.LayoutOrder
                 })           
                 
+                -- Track scrolling state so toggles/buttons don't fire during a scroll
+                do
+                    local lastCanvasPos = Items["Column"].Instance.CanvasPosition
+                    Items["Column"].Instance:GetPropertyChangedSignal("CanvasPosition"):Connect(function()
+                        local newPos = Items["Column"].Instance.CanvasPosition
+                        if newPos ~= lastCanvasPos then
+                            Library._IsScrolling = true
+                            Library._LastScrollTick = tick()
+                            lastCanvasPos = newPos
+                            task.delay(0.25, function()
+                                if tick() - Library._LastScrollTick >= 0.2 then
+                                    Library._IsScrolling = false
+                                end
+                            end)
+                        end
+                    end)
+                end
+                
                 Page.Items = Items
             end
 
@@ -2729,7 +2751,7 @@ end)
                     BorderColor3 = FromRGB(0, 0, 0),
                     Text = "",
                     AutoButtonColor = false,
-                    Active = true,
+                    Active = false,
                     BackgroundTransparency = 1,
                     Size = UDim2New(1, 0, 0, 20),
                     BorderSizePixel = 0,
@@ -2937,16 +2959,19 @@ end)
 
             do
                 local touchStartPos = nil
+                local touchStartTime = 0
                 Items["Toggle"]:Connect("InputBegan", function(Input)
                     if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
                         touchStartPos = Input.Position
+                        touchStartTime = tick()
                     end
                 end)
                 Items["Toggle"]:Connect("InputEnded", function(Input)
                     if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
-                        if touchStartPos then
+                        if touchStartPos and not Library._IsScrolling then
                             local delta = (Input.Position - touchStartPos).Magnitude
-                            if delta < 10 then
+                            local elapsed = tick() - touchStartTime
+                            if delta < 10 and elapsed < 0.3 then
                                 Toggle:Set(not Toggle.Value)
                             end
                         end
@@ -3048,16 +3073,19 @@ end)
 
             do
                 local touchStartPos = nil
+                local touchStartTime = 0
                 Items["Button"]:Connect("InputBegan", function(Input)
                     if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
                         touchStartPos = Input.Position
+                        touchStartTime = tick()
                     end
                 end)
                 Items["Button"]:Connect("InputEnded", function(Input)
                     if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
-                        if touchStartPos then
+                        if touchStartPos and not Library._IsScrolling then
                             local delta = (Input.Position - touchStartPos).Magnitude
-                            if delta < 10 then
+                            local elapsed = tick() - touchStartTime
+                            if delta < 10 and elapsed < 0.3 then
                                 Button:Press()
                             end
                         end
@@ -3119,7 +3147,7 @@ end)
                 Items["RealSlider"] = Instances:Create("TextButton", {
                     Parent = Items["Slider"].Instance,
                     Name = "\0",
-                    Active = true,
+                    Active = false,
                     BorderColor3 = FromRGB(0, 0, 0),
                     Text = "",
                     AutoButtonColor = false,
@@ -3250,6 +3278,7 @@ end)
             
             Items["RealSlider"]:Connect("InputBegan", function(Input)
                 if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
+                    if Library._IsScrolling then return end
                     Slider.Sliding = true
 
                     local SizeX = (Input.Position.X - Items["RealSlider"].Instance.AbsolutePosition.X) / Items["RealSlider"].Instance.AbsoluteSize.X
@@ -3348,6 +3377,7 @@ end)
                     BorderColor3 = FromRGB(0, 0, 0),
                     Text = "",
                     AutoButtonColor = false,
+                    Active = false,
                     AnchorPoint = Vector2New(1, 1),
                     Position = UDim2New(1, 0, 1, 0),
                     Size = UDim2New(0, 200, 0, 30),
@@ -3739,9 +3769,28 @@ end)
                 end
             end
 
-            Items["RealDropdown"]:Connect("MouseButton1Down", function()
-                Dropdown:SetOpen(not Dropdown.IsOpen)
-            end)
+            do
+                local touchStartPos = nil
+                local touchStartTime = 0
+                Items["RealDropdown"]:Connect("InputBegan", function(Input)
+                    if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
+                        touchStartPos = Input.Position
+                        touchStartTime = tick()
+                    end
+                end)
+                Items["RealDropdown"]:Connect("InputEnded", function(Input)
+                    if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
+                        if touchStartPos and not Library._IsScrolling then
+                            local delta = (Input.Position - touchStartPos).Magnitude
+                            local elapsed = tick() - touchStartTime
+                            if delta < 10 and elapsed < 0.3 then
+                                Dropdown:SetOpen(not Dropdown.IsOpen)
+                            end
+                        end
+                        touchStartPos = nil
+                    end
+                end)
+            end
 
             Library:Connect(UserInputService.InputBegan, function(Input)
                 if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
