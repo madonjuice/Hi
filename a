@@ -1,4 +1,5 @@
-
+-- Made by samet
+-- Reposted by @da7mu on Discord
 
 if getgenv().Library then
     getgenv().Library:Unload()
@@ -2324,11 +2325,11 @@ end)
 
                 if Window.IsOpen then 
                     Items["MainFrame"].Instance.Visible = true 
-                    if isMobile and Items["MobileReopenButton"] then
+                    if Items["MobileReopenButton"] then
                         Items["MobileReopenButton"].Instance.Visible = false
                     end
                 else
-                    if isMobile and Items["MobileReopenButton"] then
+                    if Items["MobileReopenButton"] then
                         Items["MobileReopenButton"].Instance.Visible = true
                     end
                 end
@@ -2357,20 +2358,6 @@ end)
                 NewTween.Tween.Completed:Connect(function()
                     Debounce = false 
                     Items["MainFrame"].Instance.Visible = Window.IsOpen
-                    if not isMobile and not Window.IsOpen then
-                        local keyName = "Right Shift"
-                        if Library.MenuKeybind then
-                            local cleanKey = tostring(Library.MenuKeybind):match("([^.]+)$")
-                            if cleanKey then
-                                keyName = cleanKey:gsub("(%l)(%u)", "%1 %2")
-                            end
-                        end
-                        Library:Notification({
-                            Title = "Interface Minimized",
-                            Content = "Press [" .. keyName .. "] to reopen UI",
-                            Time = 3
-                        })
-                    end
                 end)
             end
 
