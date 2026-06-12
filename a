@@ -196,11 +196,17 @@ local Library do
     Library.Theme = TableClone(Themes["Preset"])
 
     -- Folders
-    for Index, Value in Library.Folders do 
-        if not isfolder(Value) then
-            makefolder(Value)
+    local successFolder, err = pcall(function()
+        if not isfolder(Library.Folders.Directory) then
+            makefolder(Library.Folders.Directory)
         end
-    end
+        if not isfolder(Library.Folders.Configs) then
+            makefolder(Library.Folders.Configs)
+        end
+        if not isfolder(Library.Folders.Assets) then
+            makefolder(Library.Folders.Assets)
+        end
+    end)
 
     -- Tweening
     local Tween = { } do
@@ -2104,6 +2110,25 @@ end)
 
                 Items["MobileReopenButton"] = MobileButton
 
+                local TooltipLabel = Instances:Create("TextLabel", {
+                    Parent = Library.Holder.Instance,
+                    Name = "MinimizeTooltip",
+                    Size = UDim2.new(0, 300, 0, 30),
+                    Position = UDim2.new(0.5, -150, 0, 10),
+                    BackgroundTransparency = 0.5,
+                    BackgroundColor3 = FromRGB(18, 20, 26),
+                    FontFace = Library.Font,
+                    Text = "Press [Right Shift] to reopen UI",
+                    TextSize = 14,
+                    TextColor3 = Library.Theme.Text,
+                    Visible = false,
+                    ZIndex = 999999
+                }):AddToTheme({TextColor3 = 'Text'})
+                Instances:Create("UICorner", {
+                    Parent = TooltipLabel.Instance,
+                    CornerRadius = UDimNew(0, 6)
+                })
+
                 MinimizeButton:Connect("MouseButton1Click", function()
                     Window:SetOpen(false)
                 end)
@@ -2117,6 +2142,7 @@ end)
                 end)
                 
                 Window.Items = Items
+                Window.TooltipLabel = TooltipLabel
             end
             
             local Debounce = false
@@ -2142,6 +2168,9 @@ end)
                     Items["MainFrame"].Instance.Visible = true 
                     if isMobile and Items["MobileReopenButton"] then
                         Items["MobileReopenButton"].Instance.Visible = false
+                    end
+                    if Window.TooltipLabel then
+                        Window.TooltipLabel.Instance.Visible = false
                     end
                 end
 
@@ -2171,6 +2200,8 @@ end)
                     Items["MainFrame"].Instance.Visible = Window.IsOpen
                     if isMobile and Items["MobileReopenButton"] then
                         Items["MobileReopenButton"].Instance.Visible = not Window.IsOpen
+                    elseif not isMobile and Window.TooltipLabel then
+                        Window.TooltipLabel.Instance.Visible = not Window.IsOpen
                     end
                 end)
             end
@@ -2400,7 +2431,7 @@ end)
 
                 Name = Data.Name or Data.name or "Section",
                 Side = Data.Side or Data.side or 1,
-                Icon = Data.Icon or Data.icon or "rbxassetid://127136375066593",
+                Icon = Data.Icon or Data.icon or "rbxassetid://139428378061384",
 
                 Items = { }
             }
@@ -4119,6 +4150,9 @@ end
 
 function Library.Pages:AddSection(NameOrData, Icon)
     local Data = NormalizeNamedData(NameOrData, Icon)
+    if not (Data.Icon or Data.icon) then
+        Data.Icon = "rbxassetid://139428378061384"
+    end
     Data.Icon = Library:ResolveIcon(Data.Icon or Data.icon)
     Data.icon = Data.Icon
 
