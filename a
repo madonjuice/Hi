@@ -1,3 +1,5 @@
+-- Made by samet
+-- Reposted by @da7mu on Discord
 
 if getgenv().Library then
     getgenv().Library:Unload()
@@ -1474,7 +1476,7 @@ local Library do
                 FontFace = Library.Font,
                 TextColor3 = Library.Theme["Text"],
                 TextTransparency = 0.5,
-                Text = "[C]",
+                Text = "[None]",
                 AutoButtonColor = false,
                 Size = UDim2New(0, 0, 1, 0),
                 BackgroundTransparency = 1,
@@ -1700,7 +1702,7 @@ local Library do
             if StringFind(tostring(Key), "Enum") then 
                 Keybind.Key = tostring(Key)
 
-                Key = Key.Name == "Backspace" and "None" or Key.Name
+                Key = (Key.Name == "Backspace" or Key.Name == "Unknown") and "None" or Key.Name
 
                 local KeyString = Keys[Keybind.Key] or StringGSub(Key, "Enum.", "") or "None"
                 local TextToDisplay = StringGSub(StringGSub(KeyString, "KeyCode.", ""), "UserInputType.", "") or "None"
@@ -3837,7 +3839,7 @@ end)
                     Section = Label.Section,
 
                     Flag = Data.Flag or Data.flag or Library:NextFlag(),
-                    Default = Data.Default or Data.default or Enum.KeyCode.E,
+                    Default = Data.Default or Data.default or Enum.KeyCode.Unknown,
                     Callback = Data.Callback or Data.callback or function() end,
                     Mode = Data.Mode or Data.mode or "Toggle"
                 }
@@ -3941,7 +3943,7 @@ end)
                     Parent = Items["Background"].Instance,
                     Name = "\0",
                     FontFace = Library.Font,
-                    Active = false,
+                    Active = true,
                     TextTransparency = 0,
                     AnchorPoint = Vector2New(0, 0.5),
                     PlaceholderColor3 = FromRGB(133, 139, 143),
@@ -3951,7 +3953,7 @@ end)
                     TextColor3 = Library.Theme["Text"],
                     BorderColor3 = FromRGB(0, 0, 0),
                     Text = "",
-                    Selectable = false,
+                    Selectable = true,
                     BackgroundTransparency = 1,
                     Position = UDim2New(0, 0, 0.5, 0),
                     CursorPosition = -1,
@@ -3976,7 +3978,9 @@ end)
                 end
 
                 Textbox.Value = Value
-                Items["Input"].Instance.Text = Value
+                if Items["Input"].Instance.Text ~= Value then
+                    Items["Input"].Instance.Text = Value
+                end
                 Library.Flags[Textbox.Flag] = Value
 
                 if Textbox.Callback then
