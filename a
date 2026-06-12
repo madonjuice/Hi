@@ -1,5 +1,4 @@
--- Made by samet
--- Reposted by @da7mu on Discord
+
 
 if getgenv().Library then
     getgenv().Library:Unload()
@@ -2730,7 +2729,7 @@ end)
                     BorderColor3 = FromRGB(0, 0, 0),
                     Text = "",
                     AutoButtonColor = false,
-                    AnchorPoint = Vector2New(1, 0),
+                    Active = true,
                     BackgroundTransparency = 1,
                     Size = UDim2New(1, 0, 0, 20),
                     BorderSizePixel = 0,
@@ -2936,7 +2935,7 @@ end)
             end
             setInitialState(Toggle.Default)
 
-            Items["Toggle"]:Connect("MouseButton1Down", function()
+            Items["Toggle"]:Connect("MouseButton1Click", function()
                 Toggle:Set(not Toggle.Value)
             end)
 
@@ -3031,7 +3030,7 @@ end)
                 Items["Stroke"]:Tween(nil, {Color = Library.Theme.Outline})
             end
 
-            Items["Button"]:Connect("MouseButton1Down", function()
+            Items["Button"]:Connect("MouseButton1Click", function()
                 Button:Press()
             end)
 
@@ -3088,7 +3087,7 @@ end)
                 Items["RealSlider"] = Instances:Create("TextButton", {
                     Parent = Items["Slider"].Instance,
                     Name = "\0",
-                    Active = false,
+                    Active = true,
                     BorderColor3 = FromRGB(0, 0, 0),
                     Text = "",
                     AutoButtonColor = false,
