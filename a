@@ -1,4 +1,5 @@
-
+-- Made by samet
+-- Reposted by @da7mu on Discord
 
 if getgenv().Library then
     getgenv().Library:Unload()
@@ -1824,19 +1825,23 @@ local Library do
             }
 
             local Items = { } do
+                local isMobile = UserInputService.TouchEnabled
+                local frameSize = isMobile and UDim2New(0, 520, 0, 380) or UDim2New(0, 673, 0, 511)
+                local minResize = isMobile and Vector2New(520, 380) or Vector2New(673, 511)
+
                 Items["MainFrame"] = Instances:Create("Frame", {
                     Parent = Library.Holder.Instance,
                     Name = "\0",
                     AnchorPoint = Vector2New(0.5, 0.5),
                     Position = UDim2New(0.5220375657081604, 0, 0.5, 0),
                     BorderColor3 = FromRGB(0, 0, 0),
-                    Size = UDim2New(0, 673, 0, 511),
+                    Size = frameSize,
                     BorderSizePixel = 0,
                     BackgroundColor3 = Library.Theme["Background"]
                 }):AddToTheme({BackgroundColor3 = 'Background'})
 
                 Items["MainFrame"]:MakeDraggable()
-                Items["MainFrame"]:MakeResizeable(Vector2New(673, 511), Vector2New(9999, 9999))
+                Items["MainFrame"]:MakeResizeable(minResize, Vector2New(9999, 9999))
                 
                 Instances:Create("UICorner", {
                     Parent = Items["MainFrame"].Instance,
@@ -1969,8 +1974,8 @@ end)
                     BorderColor3 = FromRGB(0, 0, 0),
                     Image = Window.Logo,
                     BackgroundTransparency = 1,
-                    Position = UDim2New(0, 15, 0, 15),
-                    Size = UDim2New(0, 40, 0, 40),
+                    Position = UDim2New(0, 15, 0, 11),
+                    Size = UDim2New(0, 48, 0, 48),
                     BorderSizePixel = 0
                 })
                 
@@ -1984,7 +1989,7 @@ end)
                     Size = UDim2New(0, 0, 0, 14),
                     BorderSizePixel = 0,
                     BackgroundTransparency = 1,
-                    Position = UDim2New(0, 70, 0, 15),
+                    Position = UDim2New(0, 75, 0, 15),
                     TextWrapped = true,
                     AutomaticSize = Enum.AutomaticSize.X,
                     TextSize = 18
@@ -2001,7 +2006,7 @@ end)
                     BorderColor3 = FromRGB(0, 0, 0),
                     BorderSizePixel = 0,
                     BackgroundTransparency = 1,
-                    Position = UDim2New(0, 70, 0, 36),
+                    Position = UDim2New(0, 75, 0, 36),
                     TextWrapped = true,
                     AutomaticSize = Enum.AutomaticSize.X,
                     TextSize = 16
@@ -2484,7 +2489,7 @@ end)
                     AnchorPoint = Vector2New(0, 0.5),
                     BorderSizePixel = 0,
                     BackgroundTransparency = 1,
-                    Position = UDim2New(0, 45, 0.5, -2),
+                    Position = UDim2New(0, 50, 0.5, -2),
                     AutomaticSize = Enum.AutomaticSize.X,
                     TextSize = 16
                 }):AddToTheme({TextColor3 = 'Text'})
@@ -2509,7 +2514,7 @@ end)
                     Image = Section.Icon,
                     BackgroundTransparency = 1,
                     Position = UDim2New(0, 10, 0.5, 0),
-                    Size = UDim2New(0, 24, 0, 24),
+                    Size = UDim2New(0, 28, 0, 28),
                     BorderSizePixel = 0
                 }):AddToTheme({ImageColor3 = 'Text'})
                 
